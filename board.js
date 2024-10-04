@@ -57,6 +57,7 @@ gameContainer.addEventListener('pointerdown', (event) => {
 		document.body.classList.add('dragging');
 		cardElement.style.zIndex = ++topZIndex;
 		cardElement.classList.add('lifted');
+		cardElement.setPointerCapture(event.pointerId);
 	}
 	event.preventDefault();
 });
