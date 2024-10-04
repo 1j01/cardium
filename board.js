@@ -3,6 +3,26 @@ const gameContainer = document.getElementById('gameContainer');
 const cardByElement = new WeakMap();
 window.cardByElement = cardByElement;
 
+const MAX_SNAP_DISTANCE = 20;
+
+function findSnap(card) {
+	let closestSnap = null;
+	let closestDistance = MAX_SNAP_DISTANCE;
+	const cards = [...document.querySelectorAll('.card')].map(cardElement => cardByElement.get(cardElement));
+	for (const otherCard of cards) {
+		if (otherCard === card) continue;
+		if (!document.body.contains(otherCard.element)) continue;
+		for (const snap of otherCard.getSnaps()) {
+			const distance = Math.hypot(snap.center.x - card.center.x, snap.center.y - card.center.y);
+			if (distance < closestDistance) { // && snap.rotation === card.rotation
+				closestSnap = snap;
+				closestDistance = distance;
+			}
+		}
+	}
+	return closestSnap;
+}
+
 // Most scroll wheels are discrete but some are continuous, particularly touchpads.
 // Simply snapping the delta to 45 degree angles risks "snapping to" no rotation at all
 // for continuous scrolling inputs.
@@ -22,6 +42,7 @@ window.addEventListener('wheel', (event) => {
 });
 
 let topZIndex = 0;
+// @FIXME: offset breaks when zooming during drag
 let offset = { x: 0, y: 0 };
 /** @type {Card | null} */
 let draggingCard = null;
@@ -41,10 +62,20 @@ gameContainer.addEventListener('pointerdown', (event) => {
 
 window.addEventListener('pointermove', (event) => {
 	if (draggingCard) {
-		draggingCard.setPosition({
+		let targetPosition = {
 			x: event.clientX - offset.x,
 			y: event.clientY - offset.y
-		});
+		};
+		// Have to set the position before using findSnap here.
+		// Kinda awkward, could design it to be more functional
+		// with targetPosition being a CardPosition object perhaps,
+		// and passing targetPosition to findSnap.
+		draggingCard.setPosition(targetPosition);
+		const snap = findSnap(draggingCard);
+		if (snap) {
+			targetPosition = snap.center;
+		}
+		draggingCard.setPosition(targetPosition);
 	}
 });
 
