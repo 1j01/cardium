@@ -2,28 +2,6 @@ const suits = ['♠', '♥', '♦', '♣'];
 const values = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
 const gameContainer = document.getElementById('gameContainer');
 
-function createCard(suit, value) {
-	const card = document.createElement('div');
-	card.classList.add('card');
-
-	const front = document.createElement('div');
-	front.classList.add('card-face', 'card-front');
-	front.style.color = (suit === '♥' || suit === '♦') ? 'red' : 'black';
-	front.textContent = `${value}${suit}`;
-
-	const back = document.createElement('div');
-	back.classList.add('card-face', 'card-back');
-
-	card.appendChild(front);
-	card.appendChild(back);
-
-	card.addEventListener('click', () => {
-		card.classList.toggle('is-flipped');
-	});
-
-	return card;
-}
-
 function shuffleArray(array) {
 	for (let i = array.length - 1; i >= 0; i--) {
 		const j = Math.floor(Math.random() * (i + 1));
@@ -42,8 +20,11 @@ function dealCards() {
 
 	for (let i = 0; i < 12; i++) {
 		const { suit, value } = deck[i];
-		const card = createCard(suit, value);
-		gameContainer.appendChild(card);
+		const card = new Card(suit, value);
+		gameContainer.appendChild(card.element);
+		card.element.addEventListener('click', () => {
+			card.flip();
+		});
 	}
 }
 
