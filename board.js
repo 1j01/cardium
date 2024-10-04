@@ -56,6 +56,7 @@ gameContainer.addEventListener('pointerdown', (event) => {
 		};
 		document.body.classList.add('dragging');
 		cardElement.style.zIndex = ++topZIndex;
+		cardElement.classList.add('lifted');
 	}
 	event.preventDefault();
 });
@@ -80,8 +81,11 @@ window.addEventListener('pointermove', (event) => {
 });
 
 window.addEventListener('pointerup', () => {
-	draggingCard = null;
-	document.body.classList.remove('dragging');
+	if (draggingCard) {
+		draggingCard.element.classList.remove('lifted');
+		draggingCard = null;
+		document.body.classList.remove('dragging');
+	}
 	mouseWheelAccumulator = 0;
 });
 
