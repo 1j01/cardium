@@ -1,0 +1,125 @@
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Cardium</title>
+	<style>
+		body {
+			font-family: Arial, sans-serif;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			height: 100vh;
+			margin: 0;
+			background: linear-gradient(135deg, #1e5799, #2989d8, #207cca, #7db9e8);
+		}
+
+		.game-container {
+			display: flex;
+			flex-wrap: wrap;
+			justify-content: center;
+			gap: 20px;
+			perspective: 1000px;
+		}
+
+		.card {
+			width: 100px;
+			height: 150px;
+			position: relative;
+			transform-style: preserve-3d;
+			transition: transform 0.6s;
+			cursor: pointer;
+		}
+
+		.card-face {
+			position: absolute;
+			width: 100%;
+			height: 100%;
+			backface-visibility: hidden;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			font-size: 24px;
+			border-radius: 10px;
+			box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+		}
+
+		.card-front {
+			background-color: #f8f8f8;
+			border: 2px solid #333;
+		}
+
+		.card-back {
+			background-color: #5bb9f8;
+			background-image:
+				repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255, 255, 255, 0.1) 10px, rgba(255, 255, 255, 0.1) 20px),
+				repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(0, 0, 0, 0.1) 10px, rgba(0, 0, 0, 0.1) 20px);
+			border: 2px solid #333;
+			transform: rotateY(180deg);
+		}
+
+		.card.is-flipped {
+			transform: rotateY(180deg);
+		}
+	</style>
+</head>
+
+<body>
+	<div class="game-container" id="gameContainer"></div>
+
+	<script>
+		const suits = ['♠', '♥', '♦', '♣'];
+		const values = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+		const gameContainer = document.getElementById('gameContainer');
+
+		function createCard(suit, value) {
+			const card = document.createElement('div');
+			card.classList.add('card');
+
+			const front = document.createElement('div');
+			front.classList.add('card-face', 'card-front');
+			front.style.color = (suit === '♥' || suit === '♦') ? 'red' : 'black';
+			front.textContent = `${value}${suit}`;
+
+			const back = document.createElement('div');
+			back.classList.add('card-face', 'card-back');
+
+			card.appendChild(front);
+			card.appendChild(back);
+
+			card.addEventListener('click', () => {
+				card.classList.toggle('is-flipped');
+			});
+
+			return card;
+		}
+
+		function shuffleArray(array) {
+			for (let i = array.length - 1; i >= 0; i--) {
+				const j = Math.floor(Math.random() * (i + 1));
+				[array[i], array[j]] = [array[j], array[i]];
+			}
+		}
+
+		function dealCards() {
+			const deck = [];
+			for (const suit of suits) {
+				for (const value of values) {
+					deck.push({ suit, value });
+				}
+			}
+			shuffleArray(deck);
+
+			for (let i = 0; i < 12; i++) {
+				const { suit, value } = deck[i];
+				const card = createCard(suit, value);
+				gameContainer.appendChild(card);
+			}
+		}
+
+		dealCards();
+	</script>
+</body>
+
+</html>

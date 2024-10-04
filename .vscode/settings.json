@@ -1,0 +1,12 @@
+{
+	"editor.formatOnSave": true,
+	"editor.insertSpaces": false,
+	"editor.detectIndentation": false,
+	"files.insertFinalNewline": true,
+	"editor.codeActionsOnSave": {
+		"source.organizeImports": "always",
+	},
+	"javascript.preferences.importModuleSpecifierEnding": "js",
+	"typescript.preferences.importModuleSpecifierEnding": "js",
+	"html.format.unformattedContentDelimiter": "<!--no_format-->",
+}
