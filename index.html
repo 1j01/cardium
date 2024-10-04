@@ -16,20 +16,24 @@
 		}
 
 		.game-container {
-			display: flex;
+			/*display: flex;
 			flex-wrap: wrap;
 			justify-content: center;
-			gap: 20px;
+			gap: 20px;*/
 			perspective: 1000px;
 		}
 
 		.card {
 			width: 100px;
 			height: 150px;
-			position: relative;
+			/*position: relative;*/
 			transform-style: preserve-3d;
-			transition: transform 0.6s;
-			cursor: pointer;
+			/*transition: transform 0.6s;*/
+			cursor: grab;
+
+			position: absolute;
+			top: 0;
+			left: 0;
 		}
 
 		.card-face {
@@ -62,6 +66,11 @@
 		.card.is-flipped {
 			transform: rotateY(180deg);
 		}
+
+		body.dragging,
+		body.dragging * {
+			cursor: grabbing;
+		}
 	</style>
 </head>
 
@@ -69,6 +78,7 @@
 	<div class="game-container" id="gameContainer"></div>
 
 	<script src="Card.js"></script>
+	<script src="board.js"></script>
 	<script src="game.js"></script>
 </body>
 

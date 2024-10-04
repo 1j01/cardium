@@ -1,6 +1,7 @@
+// const gameContainer = document.getElementById('gameContainer');
+
 const suits = ['♠', '♥', '♦', '♣'];
 const values = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
-const gameContainer = document.getElementById('gameContainer');
 
 function shuffleArray(array) {
 	for (let i = array.length - 1; i >= 0; i--) {
@@ -22,9 +23,7 @@ function dealCards() {
 		const { suit, value } = deck[i];
 		const card = new Card(suit, value);
 		gameContainer.appendChild(card.element);
-		card.element.addEventListener('click', () => {
-			card.flip();
-		});
+		cardByElement.set(card.element, card);
 	}
 }
 

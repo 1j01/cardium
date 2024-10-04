@@ -101,14 +101,16 @@ class Card {
 	}
 
 	updatePosition() {
-		this.element.style.transform = `translate(${this.center.x}, ${this.center.y}) rotate(${this.rotation})`;
+		this.element.style.transform = `translate(${this.center.x}px, ${this.center.y}px) rotate(${this.rotation}deg)`;
 	}
 
+	/** @param {number} deltaDegrees */
 	rotate(deltaDegrees) {
 		this.rotation = (this.rotation + deltaDegrees) % 360;
 		this.updatePosition();
 	}
 
+	/** @param {Point} newCenter */
 	setPosition(newCenter) {
 		this.center = newCenter;
 		this.updatePosition();
