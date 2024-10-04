@@ -79,7 +79,8 @@ class Card {
 	}
 
 	/** 
-	 * @TODO Implement this method as described.
+	 * @TODO: find perpendicular snaps
+	 * @TODO: fix diagonal longwise snapping
 	 * @returns {CardPosition[]} a list of snapping positions
 	 * relative to this card's edges, assuming the same dimensions for the card to be snapped.
 	 * For each side, there are two valid perpendicular snaps (aligning one corner, with an overhang),
@@ -92,21 +93,29 @@ class Card {
 		edges.forEach(edge => {
 			const midX = (edge[0].x + edge[1].x) / 2;
 			const midY = (edge[0].y + edge[1].y) / 2;
+			const edgeLength = Math.hypot(edge[1].x - edge[0].x, edge[1].y - edge[0].y);
+			const perpendicular = {
+				x: (edge[1].y - edge[0].y) / edgeLength,
+				y: (edge[0].x - edge[1].x) / edgeLength
+			};
+			// parallel snap
+			const dist = edgeLength === 100 ? 150 / 2 : 100 / 2;
 			snaps.push({
-				center: { x: midX, y: midY },
-				rotation: this.rotation
+				center: { x: midX + perpendicular.x * dist, y: midY + perpendicular.y * dist },
+				rotation: this.rotation,
+				edge,
 			});
 		});
 		return snaps;
 	}
 
 	updatePosition() {
-		this.element.style.transform = `translate(${this.center.x}px, ${this.center.y}px) rotate(${this.rotation}deg)`;
+		this.element.style.transform = `translate(-50%, -50%) translate(${this.center.x}px, ${this.center.y}px) rotate(${this.rotation}deg)`;
 	}
 
 	/** @param {number} deltaDegrees */
 	rotate(deltaDegrees) {
-		this.rotation = (this.rotation + deltaDegrees) % 360;
+		this.rotation = (this.rotation + deltaDegrees + 360) % 360;
 		this.updatePosition();
 	}
 

@@ -5,6 +5,7 @@ window.cardByElement = cardByElement;
 
 const MAX_SNAP_DISTANCE = 20;
 
+// TODO: find multiple snaps of near-equal distance, for highlighting multiple edges
 function findSnap(card) {
 	let closestSnap = null;
 	let closestDistance = MAX_SNAP_DISTANCE;
@@ -14,7 +15,10 @@ function findSnap(card) {
 		if (!document.body.contains(otherCard.element)) continue;
 		for (const snap of otherCard.getSnaps()) {
 			const distance = Math.hypot(snap.center.x - card.center.x, snap.center.y - card.center.y);
-			if (distance < closestDistance) { // && snap.rotation === card.rotation
+			// Note: remainder operator only works here if
+			// the values are already constrained to within 0-360
+			// otherwise negative numbers would be a problem.
+			if (distance < closestDistance && (snap.rotation % 180) === (card.rotation % 180)) {
 				closestSnap = snap;
 				closestDistance = distance;
 			}
@@ -37,6 +41,7 @@ window.addEventListener('wheel', (event) => {
 	// Devices may vary, though.
 	if (Math.abs(mouseWheelAccumulator) > 50) {
 		draggingCard?.rotate(Math.sign(mouseWheelAccumulator) * 45);
+		// TODO: update snap with same logic as pointermove
 		mouseWheelAccumulator = 0;
 	}
 });
@@ -46,6 +51,12 @@ let topZIndex = 0;
 let offset = { x: 0, y: 0 };
 /** @type {Card | null} */
 let draggingCard = null;
+
+let edgeHighlight = document.createElement('div');
+edgeHighlight.classList.add('edge-highlight');
+gameContainer.appendChild(edgeHighlight);
+edgeHighlight.style.display = 'none';
+
 gameContainer.addEventListener('pointerdown', (event) => {
 	const cardElement = event.target.closest('.card');
 	if (cardElement) {
@@ -76,6 +87,17 @@ window.addEventListener('pointermove', (event) => {
 		const snap = findSnap(draggingCard);
 		if (snap) {
 			targetPosition = snap.center;
+			edgeHighlight.style.display = 'block';
+			const edgeAngle = Math.atan2(snap.edge[1].y - snap.edge[0].y, snap.edge[1].x - snap.edge[0].x) * 180 / Math.PI;
+			const edgeLength = Math.hypot(snap.edge[1].x - snap.edge[0].x, snap.edge[1].y - snap.edge[0].y);
+			const midX = (snap.edge[0].x + snap.edge[1].x) / 2;
+			const midY = (snap.edge[0].y + snap.edge[1].y) / 2;
+			edgeHighlight.style.transform = `translate(-50%, -50%) rotate(${edgeAngle}deg)`;
+			edgeHighlight.style.width = `${edgeLength}px`;
+			edgeHighlight.style.left = `${midX}px`;
+			edgeHighlight.style.top = `${midY}px`;
+		} else {
+			edgeHighlight.style.display = 'none';
 		}
 		draggingCard.setPosition(targetPosition);
 	}
@@ -88,5 +110,6 @@ window.addEventListener('pointerup', () => {
 		document.body.classList.remove('dragging');
 	}
 	mouseWheelAccumulator = 0;
+	edgeHighlight.style.display = 'none';
 });
 

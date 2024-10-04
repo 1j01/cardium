@@ -34,6 +34,8 @@
 			position: absolute;
 			top: 0;
 			left: 0;
+			transform: translate(-50%, -50%);
+			transform-origin: center;
 		}
 
 		.card-face {
@@ -69,12 +71,22 @@
 		}
 
 		.card.is-flipped {
-			transform: rotateY(180deg);
+			transform: translate(-50%, -50%) rotateY(180deg);
 		}
 
 		body.dragging,
 		body.dragging * {
 			cursor: grabbing;
+		}
+
+		.edge-highlight {
+			position: absolute;
+			transform-origin: center;
+			height: 5px;
+			background: rgb(255, 255, 0);
+			box-shadow: 0 0 10px rgb(255, 255, 0);
+			pointer-events: none;
+			z-index: 50000;
 		}
 	</style>
 </head>
