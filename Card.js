@@ -79,7 +79,6 @@ class Card {
 	}
 
 	/** 
-	 * @TODO: find perpendicular snaps
 	 * @returns {CardPosition[]} a list of snapping positions
 	 * relative to this card's edges, assuming the same dimensions for the card to be snapped.
 	 * For each side, there are two valid perpendicular snaps (aligning one corner, with an overhang),
@@ -95,7 +94,7 @@ class Card {
 			const edgeLength = Math.hypot(edge[1].x - edge[0].x, edge[1].y - edge[0].y);
 			const perpendicular = {
 				x: (edge[1].y - edge[0].y) / edgeLength,
-				y: (edge[0].x - edge[1].x) / edgeLength
+				y: (edge[0].x - edge[1].x) / edgeLength,
 			};
 			// parallel snap
 			const dist = edgeLength < 125 ? 150 / 2 : 100 / 2;
@@ -104,6 +103,25 @@ class Card {
 				rotation: this.rotation,
 				edge,
 			});
+			// perpendicular snaps
+			const mixedDist = (150 - 100) / 2;
+			const parallel = {
+				x: (edge[1].x - edge[0].x) / edgeLength,
+				y: (edge[1].y - edge[0].y) / edgeLength
+			};
+			const anotherDist = edgeLength < 125 ? 150 - 100 : 150 / 2;
+			[-1, 1].forEach(sign => {
+				snaps.push({
+					center: {
+						x: midX + perpendicular.x * anotherDist + parallel.x * sign * mixedDist,
+						y: midY + perpendicular.y * anotherDist + parallel.y * sign * mixedDist,
+					},
+					// rotation: this.rotation + 90 * sign,
+					rotation: (this.rotation + 90) % 360,
+					edge,
+				});
+			});
+
 		});
 		return snaps;
 	}
