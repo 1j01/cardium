@@ -195,8 +195,18 @@ class CardPosition {
 			return false; // No collision if centers are too far apart
 		}
 
+		// Shrink vertices towards centers for slight leniency
+		const leniency = 0.01;
+		for (const vertex of verticesA) {
+			vertex.x += (centerA.x - vertex.x) * leniency;
+			vertex.y += (centerA.y - vertex.y) * leniency;
+		}
+		for (const vertex of verticesB) {
+			vertex.x += (centerB.x - vertex.x) * leniency;
+			vertex.y += (centerB.y - vertex.y) * leniency;
+		}
+
 		// Separating axis theorem (SAT) for collision detection
-		// TODO: slight leniency for diagonal snaps
 		function checkSeparatingAxis(verticesA, verticesB) {
 			let siMinus = {
 				x: verticesA[3].x - verticesA[0].x,
