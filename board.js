@@ -75,6 +75,9 @@ function findSnap(cardPosition) {
 let mouseWheelAccumulator = 0;
 
 window.addEventListener('wheel', (event) => {
+	if (event.ctrlKey || event.metaKey || event.altKey || event.shiftKey) {
+		return; // don't rotate when zooming
+	}
 	mouseWheelAccumulator += event.deltaY;
 	// One scroll wheel notch gives 120 one desktop computer I tested,
 	// and on another, 100 in Chrome, and 102 in Firefox.
