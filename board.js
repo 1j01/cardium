@@ -101,7 +101,7 @@ function makeEdgeHighlight(edge) {
 	const edgeLength = Math.hypot(edge[1].x - edge[0].x, edge[1].y - edge[0].y);
 	const midX = (edge[0].x + edge[1].x) / 2;
 	const midY = (edge[0].y + edge[1].y) / 2;
-	edgeHighlight.style.transform = `translate(-50%, -50%) rotate(${edgeAngle}deg)`;
+	edgeHighlight.style.transform = `translate(-50%, -50%) rotate(${edgeAngle}deg) var(--edge-highlight-scale)`;
 	edgeHighlight.style.width = `${edgeLength}px`;
 	edgeHighlight.style.left = `${midX}px`;
 	edgeHighlight.style.top = `${midY}px`;
