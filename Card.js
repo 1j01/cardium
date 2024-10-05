@@ -154,9 +154,6 @@ class CardPosition {
 			};
 			// parallel snap
 			// TODO: rename dist, mixedDist, anotherDist
-			// and maybe change the way they are calculated
-			// to be more meaningful, testing with different card dimensions
-			// since these distance formulas were trial and error, and it doesn't fully generalize.
 			const dist = edgeLength < CARD_MEAN_SIDE_LENGTH ? CARD_HEIGHT / 2 : CARD_WIDTH / 2;
 			snaps.push(new EdgeSnap({
 				center: { x: midX + perpendicular.x * dist, y: midY + perpendicular.y * dist },
@@ -169,7 +166,7 @@ class CardPosition {
 				x: (edge[1].x - edge[0].x) / edgeLength,
 				y: (edge[1].y - edge[0].y) / edgeLength
 			};
-			const anotherDist = edgeLength < CARD_MEAN_SIDE_LENGTH ? CARD_HEIGHT - CARD_WIDTH : CARD_HEIGHT / 2;
+			const anotherDist = edgeLength < CARD_MEAN_SIDE_LENGTH ? CARD_WIDTH / 2 : CARD_HEIGHT / 2;
 			[-1, 1].forEach(sign => {
 				snaps.push(new EdgeSnap({
 					center: {
