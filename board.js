@@ -7,12 +7,17 @@ window.cardByElement = cardByElement;
 const MAX_SNAP_DISTANCE = 20;
 const SNAP_EQUIVALENCE_THRESHOLD = 0.1;
 
+function getAllCards() {
+	return [...document.querySelectorAll('.card')]
+		.map(cardElement => cardByElement.get(cardElement));
+}
+
 /** @param {CardPosition} cardPosition */
 function findSnap(cardPosition) {
 	const allSnaps = [];
 	let closestSnap = null;
 	let closestDistance = MAX_SNAP_DISTANCE;
-	const cards = [...document.querySelectorAll('.card')].map(cardElement => cardByElement.get(cardElement));
+	const cards = getAllCards();
 	for (const otherCard of cards) {
 		const otherCardPosition = otherCard.position;
 		if (otherCardPosition === cardPosition) continue;
@@ -66,6 +71,17 @@ function findSnap(cardPosition) {
 	});
 
 	return combinedSnap;
+}
+
+function findCollisions(card) {
+	const collisions = [];
+	for (const otherCard of getAllCards()) {
+		if (otherCard === card) continue;
+		if (card.position.collidesWith(otherCard.position)) {
+			collisions.push(otherCard);
+		}
+	}
+	return collisions;
 }
 
 // Most scroll wheels are discrete but some are continuous, particularly touchpads.
@@ -204,6 +220,15 @@ function updateDraggedCard({ clientX, clientY }) {
 			}
 		}
 		draggingCard.setPosition(targetPosition.center);
+		// TODO: give Card a logical position and a visual position
+		// so the visual position can move freely and then reset if it's invalid
+		// and the logical position can stay consistent for any game logic.
+		// Note: Dragging a card off a card does not currently
+		// update the visual for the other card, but
+		// it shouldn't be able to get into that state.
+		// Non-collision is not yet enforced.
+		const collisions = findCollisions(draggingCard);
+		draggingCard.element.classList.toggle('colliding', collisions.length > 0);
 	}
 }
 

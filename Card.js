@@ -176,6 +176,61 @@ class CardPosition {
 		});
 		return snaps;
 	}
+
+	/**
+	 * Checks if this rectangle collides with another rectangle.
+	 * @param {CardPosition} otherPosition The other card's oriented rectangle.
+	 * @returns {boolean} Whether this card collides with the other card.
+	 */
+	collidesWith(otherPosition) {
+		const verticesA = this.getCorners();
+		const verticesB = otherPosition.getCorners();
+		const centerA = this.center;
+		const centerB = otherPosition.center;
+
+		// Bounding circle check
+		const boundingDiameter = Math.hypot(100, 150);
+		const distanceBetweenCenters = Math.hypot(centerA.x - centerB.x, centerA.y - centerB.y);
+		if (distanceBetweenCenters > boundingDiameter) {
+			return false; // No collision if centers are too far apart
+		}
+
+		// Separating axis theorem (SAT) for collision detection
+		// TODO: slight leniency for diagonal snaps
+		function checkSeparatingAxis(verticesA, verticesB) {
+			let siMinus = {
+				x: verticesA[3].x - verticesA[0].x,
+				y: verticesA[3].y - verticesA[0].y
+			};
+
+			for (let i = 0; i < verticesA.length; i++) {
+				const siPlus = {
+					x: verticesA[(i + 1) % 4].x - verticesA[i].x,
+					y: verticesA[(i + 1) % 4].y - verticesA[i].y
+				};
+				const normal = { x: -siPlus.y, y: siPlus.x };
+				const sgni = Math.sign(siMinus.x * normal.x + siMinus.y * normal.y);
+
+				for (let j = 0; j < verticesB.length; j++) {
+					const sij = {
+						x: verticesB[j].x - verticesA[i].x,
+						y: verticesB[j].y - verticesA[i].y
+					};
+					const sgnj = Math.sign(sij.x * normal.x + sij.y * normal.y);
+					if (sgni * sgnj > 0) break; // No separating axis, continue
+					if (j === 3) return false; // Separating axis exists, no collision
+				}
+
+				// Update siMinus
+				siMinus = { x: -siPlus.x, y: -siPlus.y };
+			}
+
+			return true; // No separating axis found
+		}
+
+		// Check for both rectangles
+		return checkSeparatingAxis(verticesA, verticesB) && checkSeparatingAxis(verticesB, verticesA);
+	}
 }
 
 class EdgeSnap extends CardPosition {
