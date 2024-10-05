@@ -155,6 +155,15 @@ gameContainer.addEventListener('pointerdown', (event) => {
 			cardElement.setPointerCapture(event.pointerId);
 		} else if (event.button === 2) {
 			card.flip();
+		} else if (event.button === 1) {
+			// create cards at each snap location
+			for (const snap of card.position.getSnaps()) {
+				const newCard = new Card(card.suit, card.value);
+				newCard.position.rotation = snap.rotation; // before setPosition so it takes care of updating the visual
+				newCard.setPosition(snap.center);
+				cardByElement.set(newCard.element, newCard);
+				gameContainer.appendChild(newCard.element);
+			}
 		}
 	}
 	event.preventDefault();
