@@ -4,9 +4,10 @@ const cardByElement = new WeakMap();
 window.cardByElement = cardByElement;
 
 const MAX_SNAP_DISTANCE = 20;
+const SNAP_EQUIVALENCE_THRESHOLD = 0.1;
 
-// TODO: find multiple snaps of near-equal distance, for highlighting multiple edges
 function findSnap(card) {
+	const allSnaps = [];
 	let closestSnap = null;
 	let closestDistance = MAX_SNAP_DISTANCE;
 	const cards = [...document.querySelectorAll('.card')].map(cardElement => cardByElement.get(cardElement));
@@ -22,9 +23,46 @@ function findSnap(card) {
 				closestSnap = snap;
 				closestDistance = distance;
 			}
+			allSnaps.push(snap);
 		}
 	}
-	return closestSnap;
+	// In order to highlight multiple edges when snapping into a corner,
+	// find the edges from multiple snaps close enough to be considered equivalent.
+	if (!closestSnap) return null;
+	const combinedSnap = {
+		center: {
+			x: closestSnap.center.x,
+			y: closestSnap.center.y,
+		},
+		rotation: closestSnap.rotation,
+		edges: [],
+	};
+	for (const snap of allSnaps) {
+		if (
+			Math.hypot(snap.center.x - combinedSnap.center.x, snap.center.y - combinedSnap.center.y) < SNAP_EQUIVALENCE_THRESHOLD &&
+			(snap.rotation % 180) === (combinedSnap.rotation % 180)
+		) {
+			combinedSnap.edges.push(snap.edge);
+		}
+	}
+	// Filter out equivalent edges
+	// to handle cards that are stacked on top of each other.
+	// This may be impossible in the final game.
+	combinedSnap.edges = combinedSnap.edges.filter((edge, index, self) => {
+		return self.findIndex(other => {
+			return (
+				(
+					Math.hypot(edge[0].x - other[0].x, edge[0].y - other[0].y) < SNAP_EQUIVALENCE_THRESHOLD &&
+					Math.hypot(edge[1].x - other[1].x, edge[1].y - other[1].y) < SNAP_EQUIVALENCE_THRESHOLD
+				) || (
+					Math.hypot(edge[0].x - other[1].x, edge[0].y - other[1].y) < SNAP_EQUIVALENCE_THRESHOLD &&
+					Math.hypot(edge[1].x - other[0].x, edge[1].y - other[0].y) < SNAP_EQUIVALENCE_THRESHOLD
+				)
+			);
+		}) === index;
+	});
+
+	return combinedSnap;
 }
 
 // Most scroll wheels are discrete but some are continuous, particularly touchpads.
@@ -52,10 +90,23 @@ let offset = { x: 0, y: 0 };
 /** @type {Card | null} */
 let draggingCard = null;
 
-let edgeHighlight = document.createElement('div');
-edgeHighlight.classList.add('edge-highlight');
-gameContainer.appendChild(edgeHighlight);
-edgeHighlight.style.display = 'none';
+/** @type {HTMLDivElement[]} */
+const edgeHighlights = [];
+function makeEdgeHighlight(edge) {
+	let edgeHighlight = document.createElement('div');
+	edgeHighlight.classList.add('edge-highlight');
+	const edgeAngle = Math.atan2(edge[1].y - edge[0].y, edge[1].x - edge[0].x) * 180 / Math.PI;
+	const edgeLength = Math.hypot(edge[1].x - edge[0].x, edge[1].y - edge[0].y);
+	const midX = (edge[0].x + edge[1].x) / 2;
+	const midY = (edge[0].y + edge[1].y) / 2;
+	edgeHighlight.style.transform = `translate(-50%, -50%) rotate(${edgeAngle}deg)`;
+	edgeHighlight.style.width = `${edgeLength}px`;
+	edgeHighlight.style.left = `${midX}px`;
+	edgeHighlight.style.top = `${midY}px`;
+	gameContainer.appendChild(edgeHighlight);
+	edgeHighlights.push(edgeHighlight);
+	return edgeHighlight;
+}
 
 gameContainer.addEventListener('pointerdown', (event) => {
 	const cardElement = event.target.closest('.card');
@@ -85,19 +136,15 @@ window.addEventListener('pointermove', (event) => {
 		// and passing targetPosition to findSnap.
 		draggingCard.setPosition(targetPosition);
 		const snap = findSnap(draggingCard);
+		for (const edgeHighlight of edgeHighlights) {
+			edgeHighlight.remove();
+		}
+		edgeHighlights.length = 0;
 		if (snap) {
 			targetPosition = snap.center;
-			edgeHighlight.style.display = 'block';
-			const edgeAngle = Math.atan2(snap.edge[1].y - snap.edge[0].y, snap.edge[1].x - snap.edge[0].x) * 180 / Math.PI;
-			const edgeLength = Math.hypot(snap.edge[1].x - snap.edge[0].x, snap.edge[1].y - snap.edge[0].y);
-			const midX = (snap.edge[0].x + snap.edge[1].x) / 2;
-			const midY = (snap.edge[0].y + snap.edge[1].y) / 2;
-			edgeHighlight.style.transform = `translate(-50%, -50%) rotate(${edgeAngle}deg)`;
-			edgeHighlight.style.width = `${edgeLength}px`;
-			edgeHighlight.style.left = `${midX}px`;
-			edgeHighlight.style.top = `${midY}px`;
-		} else {
-			edgeHighlight.style.display = 'none';
+			for (const edge of snap.edges) {
+				makeEdgeHighlight(edge);
+			}
 		}
 		draggingCard.setPosition(targetPosition);
 	}
@@ -110,6 +157,9 @@ window.addEventListener('pointerup', () => {
 		document.body.classList.remove('dragging');
 	}
 	mouseWheelAccumulator = 0;
-	edgeHighlight.style.display = 'none';
+	for (const edgeHighlight of edgeHighlights) {
+		edgeHighlight.remove();
+	}
+	edgeHighlights.length = 0;
 });
 
