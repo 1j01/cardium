@@ -8,7 +8,7 @@
  * Represents a playing card.
  */
 class Card {
-	constructor(value, suit) {
+	constructor(suit, value) {
 		/** @type {'♠'|'♥'|'♦'|'♣'} */
 		this.suit = suit;
 		/** @type {'A'|'2'|'3'|'4'|'5'|'6'|'7'|'8'|'9'|'10'|'J'|'Q'|'K'} */
