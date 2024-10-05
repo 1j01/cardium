@@ -79,7 +79,9 @@ window.addEventListener('wheel', (event) => {
 	// Devices may vary, though.
 	if (Math.abs(mouseWheelAccumulator) > 50) {
 		draggingCard?.rotate(Math.sign(mouseWheelAccumulator) * 45);
-		// TODO: update snap with same logic as pointermove
+		// Update snapped position and highlights
+		updateDraggedCard(event);
+
 		mouseWheelAccumulator = 0;
 	}
 });
@@ -125,6 +127,10 @@ gameContainer.addEventListener('pointerdown', (event) => {
 });
 
 window.addEventListener('pointermove', (event) => {
+	updateDraggedCard(event);
+});
+
+function updateDraggedCard(event) {
 	if (draggingCard) {
 		let targetPosition = {
 			x: event.clientX - offset.x,
@@ -148,7 +154,7 @@ window.addEventListener('pointermove', (event) => {
 		}
 		draggingCard.setPosition(targetPosition);
 	}
-});
+}
 
 window.addEventListener('pointerup', () => {
 	if (draggingCard) {
