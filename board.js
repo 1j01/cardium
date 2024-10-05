@@ -94,6 +94,7 @@ let draggingCard = null;
 
 /** @type {HTMLDivElement[]} */
 const edgeHighlights = [];
+
 function makeEdgeHighlight(edge) {
 	let edgeHighlight = document.createElement('div');
 	edgeHighlight.classList.add('edge-highlight');
@@ -108,6 +109,13 @@ function makeEdgeHighlight(edge) {
 	gameContainer.appendChild(edgeHighlight);
 	edgeHighlights.push(edgeHighlight);
 	return edgeHighlight;
+}
+
+function clearEdgeHighlights() {
+	for (const edgeHighlight of edgeHighlights) {
+		edgeHighlight.remove();
+	}
+	edgeHighlights.length = 0;
 }
 
 gameContainer.addEventListener('pointerdown', (event) => {
@@ -142,10 +150,7 @@ function updateDraggedCard(event) {
 		// and passing targetPosition to findSnap.
 		draggingCard.setPosition(targetPosition);
 		const snap = findSnap(draggingCard);
-		for (const edgeHighlight of edgeHighlights) {
-			edgeHighlight.remove();
-		}
-		edgeHighlights.length = 0;
+		clearEdgeHighlights();
 		if (snap) {
 			targetPosition = snap.center;
 			for (const edge of snap.edges) {
@@ -163,9 +168,6 @@ window.addEventListener('pointerup', () => {
 		document.body.classList.remove('dragging');
 	}
 	mouseWheelAccumulator = 0;
-	for (const edgeHighlight of edgeHighlights) {
-		edgeHighlight.remove();
-	}
-	edgeHighlights.length = 0;
+	clearEdgeHighlights();
 });
 
