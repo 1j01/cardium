@@ -94,13 +94,16 @@
 			transform: rotateY(180deg);
 		}
 
-		/* Can't use CSS transition for this since the transform is set in JS */
+		/* Can't use CSS transition for this since the transform is set in JS... or it would need to apply to the card faces or a separate wrapper element. */
 		/*.card.is-flipped {
 			transform: translate(-50%, -50%) rotateY(180deg);
 		}*/
 
-		.card.colliding {
+		/* Can't apply filter or opacity to the .card directly as it will break preserve-3d. */
+		/* See https://css-tricks.com/things-watch-working-css-3d/#3-opacity */
+		.card.colliding .card-face {
 			filter: drop-shadow(0 0 5px red) brightness(0.8) sepia(1) hue-rotate(-50deg) saturate(5);
+			/*opacity: 0.5;*/
 		}
 
 		body.dragging,

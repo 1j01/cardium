@@ -78,6 +78,7 @@ class Card {
 		const animateFlip = () => {
 			const target = this.flipped ? 180 : 0;
 			// TODO: use delta time, and perhaps a different easing function
+			// (Could use a CSS transition, but it would have to apply to the card faces (ugly) or a separate wrapper (ugly))
 			this._smoothedFlip += (target - this._smoothedFlip) * this.FLIP_LERP_FACTOR;
 			if (Math.abs(this._smoothedFlip - target) < 0.01) {
 				this._smoothedFlip = target;
