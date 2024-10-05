@@ -1,3 +1,10 @@
+const CARD_WIDTH = 100;
+const CARD_HEIGHT = 150;
+const CARD_MEAN_SIDE_LENGTH = (CARD_WIDTH + CARD_HEIGHT) / 2;
+const CARD_BOUNDING_DIAMETER = Math.hypot(CARD_WIDTH, CARD_HEIGHT);
+
+document.body.style.setProperty('--card-width', `${CARD_WIDTH}px`);
+document.body.style.setProperty('--card-height', `${CARD_HEIGHT}px`);
 
 /**
  * @typedef {{x: number, y: number}} Point
@@ -99,18 +106,16 @@ class CardPosition {
 
 	/** @returns {[Point, Point, Point, Point]} */
 	getCorners() {
-		const width = 100;
-		const height = 150;
 		const rad = this.rotation * Math.PI / 180;
 		const cos = Math.cos(rad);
 		const sin = Math.sin(rad);
 		const cx = this.center.x;
 		const cy = this.center.y;
 		const corners = [
-			{ x: -width / 2, y: -height / 2 },
-			{ x: width / 2, y: -height / 2 },
-			{ x: width / 2, y: height / 2 },
-			{ x: -width / 2, y: height / 2 }
+			{ x: -CARD_WIDTH / 2, y: -CARD_HEIGHT / 2 },
+			{ x: CARD_WIDTH / 2, y: -CARD_HEIGHT / 2 },
+			{ x: CARD_WIDTH / 2, y: CARD_HEIGHT / 2 },
+			{ x: -CARD_WIDTH / 2, y: CARD_HEIGHT / 2 }
 		];
 		return corners.map(pt => ({
 			x: cx + pt.x * cos - pt.y * sin,
@@ -148,19 +153,23 @@ class CardPosition {
 				y: (edge[0].x - edge[1].x) / edgeLength,
 			};
 			// parallel snap
-			const dist = edgeLength < 125 ? 150 / 2 : 100 / 2;
+			// TODO: rename dist, mixedDist, anotherDist
+			// and maybe change the way they are calculated
+			// to be more meaningful, testing with different card dimensions
+			// since these distance formulas were trial and error, and it doesn't fully generalize.
+			const dist = edgeLength < CARD_MEAN_SIDE_LENGTH ? CARD_HEIGHT / 2 : CARD_WIDTH / 2;
 			snaps.push(new EdgeSnap({
 				center: { x: midX + perpendicular.x * dist, y: midY + perpendicular.y * dist },
 				rotation: this.rotation,
 				edge,
 			}));
 			// perpendicular snaps
-			const mixedDist = (150 - 100) / 2;
+			const mixedDist = (CARD_HEIGHT - CARD_WIDTH) / 2;
 			const parallel = {
 				x: (edge[1].x - edge[0].x) / edgeLength,
 				y: (edge[1].y - edge[0].y) / edgeLength
 			};
-			const anotherDist = edgeLength < 125 ? 150 - 100 : 150 / 2;
+			const anotherDist = edgeLength < CARD_MEAN_SIDE_LENGTH ? CARD_HEIGHT - CARD_WIDTH : CARD_HEIGHT / 2;
 			[-1, 1].forEach(sign => {
 				snaps.push(new EdgeSnap({
 					center: {
@@ -189,9 +198,8 @@ class CardPosition {
 		const centerB = otherPosition.center;
 
 		// Bounding circle check
-		const boundingDiameter = Math.hypot(100, 150);
 		const distanceBetweenCenters = Math.hypot(centerA.x - centerB.x, centerA.y - centerB.y);
-		if (distanceBetweenCenters > boundingDiameter) {
+		if (distanceBetweenCenters > CARD_BOUNDING_DIAMETER) {
 			return false; // No collision if centers are too far apart
 		}
 
