@@ -90,7 +90,6 @@ window.addEventListener('wheel', (event) => {
 });
 
 let topZIndex = 0;
-// @FIXME: offset breaks when zooming during drag
 let offset = { x: 0, y: 0 };
 /** @type {Card | null} */
 let draggingCard = null;
@@ -137,15 +136,28 @@ gameContainer.addEventListener('pointerdown', (event) => {
 	event.preventDefault();
 });
 
+/**
+ * for when the mouse stays in the same place,
+ * but its coordinates in the document change due to scrolling or browser zooming (handled with scroll and resize events)
+ * @type {{ clientX: number, clientY: number, devicePixelRatio: number }}
+ */
+let infoForZoomHandling = { clientX: 0, clientY: 0, devicePixelRatio: window.devicePixelRatio };
+
 window.addEventListener('pointermove', (event) => {
+	// console.log("pointermove", window.devicePixelRatio, window.devicePixelRatio !== infoForZoomHandling.devicePixelRatio);
 	updateDraggedCard(event);
+	infoForZoomHandling = {
+		clientX: event.clientX,
+		clientY: event.clientY,
+		devicePixelRatio: window.devicePixelRatio
+	};
 });
 
-function updateDraggedCard(event) {
+function updateDraggedCard({ clientX, clientY }) {
 	if (draggingCard) {
 		let targetPosition = new CardPosition({
-			x: event.clientX - offset.x,
-			y: event.clientY - offset.y
+			x: clientX - offset.x,
+			y: clientY - offset.y
 		}, draggingCard.position.rotation);
 		const snap = findSnap(targetPosition);
 		clearEdgeHighlights();
@@ -169,3 +181,26 @@ window.addEventListener('pointerup', () => {
 	clearEdgeHighlights();
 });
 
+// Handle zooming in/out during a drag
+// This isn't quite perfect, it doesn't handle moving the mouse while zooming while dragging
+// (the offset can become incorrect),
+// but it's better than what most people would bother with.
+// I previously did something similar in JS Paint for the cursor position,
+// so I'm copying the strategy from there, but it's not working quite as well.
+// Perhaps I need to rescale also on pointermove in case the devicePixelRatio changes before the resize event?
+window.addEventListener('resize', () => {
+	// console.log("resize", window.devicePixelRatio, window.devicePixelRatio !== infoForZoomHandling.devicePixelRatio);
+	if (window.devicePixelRatio !== infoForZoomHandling.devicePixelRatio) {
+		requestAnimationFrame(() => {
+			const rescale = infoForZoomHandling.devicePixelRatio / devicePixelRatio;
+			infoForZoomHandling.clientX *= rescale;
+			infoForZoomHandling.clientY *= rescale;
+			infoForZoomHandling.devicePixelRatio = devicePixelRatio;
+			if (draggingCard) {
+				offset.x *= rescale;
+				offset.y *= rescale;
+				updateDraggedCard(infoForZoomHandling);
+			}
+		});
+	}
+});
