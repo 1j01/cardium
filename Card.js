@@ -8,6 +8,8 @@
  * Represents a playing card.
  */
 class Card {
+	FLIP_LERP_FACTOR = 0.1;
+
 	constructor(suit, value) {
 		/** @type {'♠'|'♥'|'♦'|'♣'} */
 		this.suit = suit;
@@ -19,6 +21,10 @@ class Card {
 		this.flipped = false;
 		/** @type {HTMLElement} */
 		this.element = this.createElement();
+		/** @type {number} */
+		this._smoothedFlip = 0
+		/** @type {number} */
+		this._animId = 0
 	}
 
 	createElement() {
@@ -41,7 +47,7 @@ class Card {
 
 	updatePosition() {
 		const { center, rotation } = this.position;
-		this.element.style.transform = `translate(-50%, -50%) translate(${center.x}px, ${center.y}px) rotate(${rotation}deg)`;
+		this.element.style.transform = `translate(-50%, -50%) translate(${center.x}px, ${center.y}px) rotate(${rotation}deg) rotateY(${this._smoothedFlip}deg)`;
 	}
 
 	/** @param {number} deltaDegrees */
@@ -59,6 +65,22 @@ class Card {
 	flip() {
 		this.flipped = !this.flipped;
 		this.element.classList.toggle('is-flipped', this.flipped);
+		if (this._animId) {
+			cancelAnimationFrame(this._animId)
+		}
+		const animateFlip = () => {
+			const target = this.flipped ? 180 : 0;
+			// TODO: use delta time, and perhaps a different easing function
+			this._smoothedFlip += (target - this._smoothedFlip) * this.FLIP_LERP_FACTOR;
+			if (Math.abs(this._smoothedFlip - target) < 0.01) {
+				this._smoothedFlip = target;
+			}
+			this.updatePosition();
+			if (this._smoothedFlip !== target) {
+				this._animId = requestAnimationFrame(animateFlip);
+			}
+		}
+		animateFlip();
 	}
 }
 

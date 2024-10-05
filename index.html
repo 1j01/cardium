@@ -72,9 +72,10 @@
 			transform: rotateY(180deg);
 		}
 
-		.card.is-flipped {
+		/* Can't use CSS transition for this since the transform is set in JS */
+		/*.card.is-flipped {
 			transform: translate(-50%, -50%) rotateY(180deg);
-		}
+		}*/
 
 		body.dragging,
 		body.dragging * {

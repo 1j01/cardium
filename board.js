@@ -126,16 +126,27 @@ function clearEdgeHighlights() {
 gameContainer.addEventListener('pointerdown', (event) => {
 	const cardElement = event.target.closest('.card');
 	if (cardElement) {
-		draggingCard = cardByElement.get(cardElement);
-		offset = {
-			x: event.clientX - draggingCard.position.center.x,
-			y: event.clientY - draggingCard.position.center.y
-		};
-		document.body.classList.add('dragging');
-		cardElement.style.zIndex = ++topZIndex;
-		cardElement.classList.add('lifted');
-		cardElement.setPointerCapture(event.pointerId);
+		const card = cardByElement.get(cardElement);
+		if (event.button === 0) {
+			draggingCard = card;
+			offset = {
+				x: event.clientX - draggingCard.position.center.x,
+				y: event.clientY - draggingCard.position.center.y
+			};
+			document.body.classList.add('dragging');
+			cardElement.style.zIndex = ++topZIndex;
+			cardElement.classList.add('lifted');
+			cardElement.setPointerCapture(event.pointerId);
+		} else if (event.button === 2) {
+			card.flip();
+		}
 	}
+	event.preventDefault();
+});
+
+// TODO: I would use gameContainer instead here,
+// but it's not sized to the whole page, and adding `height: 100vh` to it is breaking the layout.
+document.body.addEventListener('contextmenu', (event) => {
 	event.preventDefault();
 });
 
