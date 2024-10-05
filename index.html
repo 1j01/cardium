@@ -102,8 +102,19 @@
 		/* Can't apply filter or opacity to the .card directly as it will break preserve-3d. */
 		/* See https://css-tricks.com/things-watch-working-css-3d/#3-opacity */
 		.card.colliding .card-face {
-			filter: drop-shadow(0 0 5px red) brightness(0.8) sepia(1) hue-rotate(-50deg) saturate(5);
-			/*opacity: 0.5;*/
+			filter: drop-shadow(0 0 5px red) brightness(0.8) sepia(1) hue-rotate(-55deg) saturate(20);
+			opacity: 0.7;
+			/* Subtle version: */
+			/* filter: drop-shadow(0 0 5px red) brightness(0.8) sepia(1) hue-rotate(-50deg) saturate(5); */
+			/* It might be better to emphasize valid positions and downplay invalid positions, as most positions may be invalid... */
+			/* I kinda like just a simple opacity: 0.5; */
+			/* Maybe I could show it as red only if it's _snapped_ to an invalid location? But is that a useful distinction? */
+			/* Maybe I should highlight the cards that are being collided with instead of the dragged card? (Or even the overlap region? But that's harder.) */
+		}
+
+		.card.colliding .card-face.card-back {
+			/* saturate(20) makes it solid red for the card back */
+			filter: drop-shadow(0 0 5px red) brightness(0.8) sepia(1) hue-rotate(-55deg) saturate(7);
 		}
 
 		body.dragging,
