@@ -2,22 +2,19 @@
 /**
  * @typedef {{x: number, y: number}} Point
  * @typedef {[Point, Point]} Edge
- * @typedef {{center: Point, rotation: number}} CardPosition
  */
 
 /**
  * Represents a playing card.
  */
 class Card {
-	constructor(suit, value, center = { x: 0, y: 0 }, rotation = 0) {
+	constructor(value, suit) {
 		/** @type {'♠'|'♥'|'♦'|'♣'} */
 		this.suit = suit;
 		/** @type {'A'|'2'|'3'|'4'|'5'|'6'|'7'|'8'|'9'|'10'|'J'|'Q'|'K'} */
 		this.value = value;
-		/** @type {Point} */
-		this.center = center;
-		/** @type {number} */
-		this.rotation = rotation; // in degrees
+		/** @type {CardPosition} */
+		this.position = new CardPosition();
 		/** @type {boolean} */
 		this.flipped = false;
 		/** @type {HTMLElement} */
@@ -25,10 +22,6 @@ class Card {
 	}
 
 	createElement() {
-		// Note: it may be better to separate card rendering from card placement logic,
-		// possibly with a CardPosition class for the placement logic (which might also be used for the return value of getSnaps()).
-		// or simply exposing elements for the front and back of the card, to be populated externally.
-
 		const card = document.createElement('div');
 		card.classList.add('card');
 
@@ -44,6 +37,42 @@ class Card {
 		card.appendChild(back);
 
 		return card;
+	}
+
+	updatePosition() {
+		const { center, rotation } = this.position;
+		this.element.style.transform = `translate(-50%, -50%) translate(${center.x}px, ${center.y}px) rotate(${rotation}deg)`;
+	}
+
+	/** @param {number} deltaDegrees */
+	rotate(deltaDegrees) {
+		this.position.rotation = (this.position.rotation + deltaDegrees + 360) % 360;
+		this.updatePosition();
+	}
+
+	/** @param {Point} newCenter */
+	setPosition(newCenter) {
+		this.position.center = newCenter;
+		this.updatePosition();
+	}
+
+	flip() {
+		this.flipped = !this.flipped;
+		this.element.classList.toggle('is-flipped', this.flipped);
+	}
+}
+
+/**
+ * Represents a playing card's position and orientation. A 2D oriented bounding box.
+ * 
+ * (Might want to dissolve this into a typedef...)
+ */
+class CardPosition {
+	constructor(center = { x: 0, y: 0 }, rotation = 0) {
+		/** @type {Point} */
+		this.center = center;
+		/** @type {number} */
+		this.rotation = rotation; // in degrees
 	}
 
 	/** @returns {[Point, Point, Point, Point]} */
@@ -124,27 +153,6 @@ class Card {
 
 		});
 		return snaps;
-	}
-
-	updatePosition() {
-		this.element.style.transform = `translate(-50%, -50%) translate(${this.center.x}px, ${this.center.y}px) rotate(${this.rotation}deg)`;
-	}
-
-	/** @param {number} deltaDegrees */
-	rotate(deltaDegrees) {
-		this.rotation = (this.rotation + deltaDegrees + 360) % 360;
-		this.updatePosition();
-	}
-
-	/** @param {Point} newCenter */
-	setPosition(newCenter) {
-		this.center = newCenter;
-		this.updatePosition();
-	}
-
-	flip() {
-		this.flipped = !this.flipped;
-		this.element.classList.toggle('is-flipped', this.flipped);
 	}
 }
 

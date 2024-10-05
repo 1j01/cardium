@@ -6,20 +6,22 @@ window.cardByElement = cardByElement;
 const MAX_SNAP_DISTANCE = 20;
 const SNAP_EQUIVALENCE_THRESHOLD = 0.1;
 
-function findSnap(card) {
+/** @param {CardPosition} cardPosition */
+function findSnap(cardPosition) {
 	const allSnaps = [];
 	let closestSnap = null;
 	let closestDistance = MAX_SNAP_DISTANCE;
 	const cards = [...document.querySelectorAll('.card')].map(cardElement => cardByElement.get(cardElement));
 	for (const otherCard of cards) {
-		if (otherCard === card) continue;
+		const otherCardPosition = otherCard.position;
+		if (otherCardPosition === cardPosition) continue;
 		if (!document.body.contains(otherCard.element)) continue;
-		for (const snap of otherCard.getSnaps()) {
-			const distance = Math.hypot(snap.center.x - card.center.x, snap.center.y - card.center.y);
+		for (const snap of otherCardPosition.getSnaps()) {
+			const distance = Math.hypot(snap.center.x - cardPosition.center.x, snap.center.y - cardPosition.center.y);
 			// Note: remainder operator only works here if
 			// the values are already constrained to within 0-360
 			// otherwise negative numbers would be a problem.
-			if (distance < closestDistance && (snap.rotation % 180) === (card.rotation % 180)) {
+			if (distance < closestDistance && (snap.rotation % 180) === (cardPosition.rotation % 180)) {
 				closestSnap = snap;
 				closestDistance = distance;
 			}
@@ -123,8 +125,8 @@ gameContainer.addEventListener('pointerdown', (event) => {
 	if (cardElement) {
 		draggingCard = cardByElement.get(cardElement);
 		offset = {
-			x: event.clientX - draggingCard.center.x,
-			y: event.clientY - draggingCard.center.y
+			x: event.clientX - draggingCard.position.center.x,
+			y: event.clientY - draggingCard.position.center.y
 		};
 		document.body.classList.add('dragging');
 		cardElement.style.zIndex = ++topZIndex;
@@ -140,24 +142,19 @@ window.addEventListener('pointermove', (event) => {
 
 function updateDraggedCard(event) {
 	if (draggingCard) {
-		let targetPosition = {
+		let targetPosition = new CardPosition({
 			x: event.clientX - offset.x,
 			y: event.clientY - offset.y
-		};
-		// Have to set the position before using findSnap here.
-		// Kinda awkward, could design it to be more functional
-		// with targetPosition being a CardPosition object perhaps,
-		// and passing targetPosition to findSnap.
-		draggingCard.setPosition(targetPosition);
-		const snap = findSnap(draggingCard);
+		}, draggingCard.position.rotation);
+		const snap = findSnap(targetPosition);
 		clearEdgeHighlights();
 		if (snap) {
-			targetPosition = snap.center;
+			targetPosition = snap;
 			for (const edge of snap.edges) {
 				makeEdgeHighlight(edge);
 			}
 		}
-		draggingCard.setPosition(targetPosition);
+		draggingCard.setPosition(targetPosition.center);
 	}
 }
 
