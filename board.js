@@ -1,5 +1,6 @@
 const gameContainer = document.getElementById('gameContainer');
 
+/** @type {WeakMap<HTMLElement, Card>} */
 const cardByElement = new WeakMap();
 window.cardByElement = cardByElement;
 
@@ -31,14 +32,14 @@ function findSnap(cardPosition) {
 	// In order to highlight multiple edges when snapping into a corner,
 	// find the edges from multiple snaps close enough to be considered equivalent.
 	if (!closestSnap) return null;
-	const combinedSnap = {
+	const combinedSnap = new CombinedSnap({
 		center: {
 			x: closestSnap.center.x,
 			y: closestSnap.center.y,
 		},
 		rotation: closestSnap.rotation,
 		edges: [],
-	};
+	});
 	for (const snap of allSnaps) {
 		if (
 			Math.hypot(snap.center.x - combinedSnap.center.x, snap.center.y - combinedSnap.center.y) < SNAP_EQUIVALENCE_THRESHOLD &&

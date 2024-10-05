@@ -108,7 +108,7 @@ class CardPosition {
 	}
 
 	/** 
-	 * @returns {CardPosition[]} a list of snapping positions
+	 * @returns {EdgeSnap[]} a list of snapping positions
 	 * relative to this card's edges, assuming the same dimensions for the card to be snapped.
 	 * For each side, there are two valid perpendicular snaps (aligning one corner, with an overhang),
 	 * and one valid parallel snap (aligning two corners),
@@ -127,11 +127,11 @@ class CardPosition {
 			};
 			// parallel snap
 			const dist = edgeLength < 125 ? 150 / 2 : 100 / 2;
-			snaps.push({
+			snaps.push(new EdgeSnap({
 				center: { x: midX + perpendicular.x * dist, y: midY + perpendicular.y * dist },
 				rotation: this.rotation,
 				edge,
-			});
+			}));
 			// perpendicular snaps
 			const mixedDist = (150 - 100) / 2;
 			const parallel = {
@@ -140,7 +140,7 @@ class CardPosition {
 			};
 			const anotherDist = edgeLength < 125 ? 150 - 100 : 150 / 2;
 			[-1, 1].forEach(sign => {
-				snaps.push({
+				snaps.push(new EdgeSnap({
 					center: {
 						x: midX + perpendicular.x * anotherDist + parallel.x * sign * mixedDist,
 						y: midY + perpendicular.y * anotherDist + parallel.y * sign * mixedDist,
@@ -148,7 +148,7 @@ class CardPosition {
 					// rotation: this.rotation + 90 * sign,
 					rotation: (this.rotation + 90) % 360,
 					edge,
-				});
+				}));
 			});
 
 		});
@@ -156,4 +156,35 @@ class CardPosition {
 	}
 }
 
-window.Card = Card;
+class EdgeSnap extends CardPosition {
+	/**
+	 * @param {Object} options
+	 * @param {Point} options.center
+	 * @param {number} options.rotation
+	 * @param {Edge} options.edge
+	 */
+	constructor({ center, rotation, edge }) {
+		super(center, rotation);
+		/** @type {Edge} */
+		this.edge = edge;
+	}
+}
+
+class CombinedSnap extends CardPosition {
+	/**
+	 * @param {Object} options
+	 * @param {Point} options.center
+	 * @param {number} options.rotation
+	 * @param {Edge[]} options.edges
+	 */
+	constructor({ center, rotation, edges }) {
+		super(center, rotation);
+		/** @type {Edge[]} */
+		this.edges = edges;
+	}
+}
+
+// window.Card = Card;
+// window.CardPosition = CardPosition;
+// window.EdgeSnap = EdgeSnap;
+// window.CombinedSnap = CombinedSnap;
