@@ -136,15 +136,37 @@ gameContainer.addEventListener('pointerdown', (event) => {
 	event.preventDefault();
 });
 
-/**
- * for when the mouse stays in the same place,
- * but its coordinates in the document change due to scrolling or browser zooming (handled with scroll and resize events)
- * @type {{ clientX: number, clientY: number, devicePixelRatio: number }}
- */
 let infoForZoomHandling = { clientX: 0, clientY: 0, devicePixelRatio: window.devicePixelRatio };
 
+/**
+ * Handle zooming in/out during a drag.
+ * 
+ * When zooming or scrolling, the mouse position in document coordinates changes,
+ * even if the mouse stays in the same place on the screen.
+ * 
+ * The devicePixelRatio can change before a resize event is fired,
+ * so this function needs to be called on pointermove too,
+ * in case the mouse is moving while zooming while dragging.
+ * 
+ * I previously did something similar in JS Paint for the cursor position,
+ * so I'm copying the strategy from there.
+ * @See https://github.com/1j01/jspaint/blob/04804396e187b1bf4af9cc31ca449d18661f97ed/src/functions.js#L183-L189
+ */
+function rescaleToHandleZooming() {
+	if (window.devicePixelRatio !== infoForZoomHandling.devicePixelRatio) {
+		const rescale = infoForZoomHandling.devicePixelRatio / devicePixelRatio;
+		infoForZoomHandling.clientX *= rescale;
+		infoForZoomHandling.clientY *= rescale;
+		infoForZoomHandling.devicePixelRatio = devicePixelRatio;
+		if (draggingCard) {
+			offset.x *= rescale;
+			offset.y *= rescale;
+		}
+	}
+}
+
 window.addEventListener('pointermove', (event) => {
-	// console.log("pointermove", window.devicePixelRatio, window.devicePixelRatio !== infoForZoomHandling.devicePixelRatio);
+	rescaleToHandleZooming();
 	updateDraggedCard(event);
 	infoForZoomHandling = {
 		clientX: event.clientX,
@@ -181,26 +203,9 @@ window.addEventListener('pointerup', () => {
 	clearEdgeHighlights();
 });
 
-// Handle zooming in/out during a drag
-// This isn't quite perfect, it doesn't handle moving the mouse while zooming while dragging
-// (the offset can become incorrect),
-// but it's better than what most people would bother with.
-// I previously did something similar in JS Paint for the cursor position,
-// so I'm copying the strategy from there, but it's not working quite as well.
-// Perhaps I need to rescale also on pointermove in case the devicePixelRatio changes before the resize event?
 window.addEventListener('resize', () => {
-	// console.log("resize", window.devicePixelRatio, window.devicePixelRatio !== infoForZoomHandling.devicePixelRatio);
-	if (window.devicePixelRatio !== infoForZoomHandling.devicePixelRatio) {
-		requestAnimationFrame(() => {
-			const rescale = infoForZoomHandling.devicePixelRatio / devicePixelRatio;
-			infoForZoomHandling.clientX *= rescale;
-			infoForZoomHandling.clientY *= rescale;
-			infoForZoomHandling.devicePixelRatio = devicePixelRatio;
-			if (draggingCard) {
-				offset.x *= rescale;
-				offset.y *= rescale;
-				updateDraggedCard(infoForZoomHandling);
-			}
-		});
+	rescaleToHandleZooming();
+	if (draggingCard) {
+		updateDraggedCard(infoForZoomHandling);
 	}
 });
