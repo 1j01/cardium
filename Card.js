@@ -22,8 +22,8 @@ class Card {
 		this.suit = suit;
 		/** @type {'A'|'2'|'3'|'4'|'5'|'6'|'7'|'8'|'9'|'10'|'J'|'Q'|'K'} */
 		this.value = value;
-		/** @type {CardPosition} */
-		this.position = new CardPosition();
+		/** @type {CardLoc} */
+		this.loc = new CardLoc();
 		/** @type {boolean} */
 		this.flipped = false;
 		/** @type {HTMLElement} */
@@ -53,19 +53,19 @@ class Card {
 	}
 
 	updateTransform() {
-		const { center, rotation } = this.position;
+		const { center, rotation } = this.loc;
 		this.element.style.transform = `translate(-50%, -50%) translate(${center.x}px, ${center.y}px) rotate(${rotation}deg) rotateY(${this._smoothedFlip}deg)`;
 	}
 
 	/** @param {number} deltaDegrees */
 	rotate(deltaDegrees) {
-		this.position.rotation = (this.position.rotation + deltaDegrees + 360) % 360;
+		this.loc.rotation = (this.loc.rotation + deltaDegrees + 360) % 360;
 		this.updateTransform();
 	}
 
 	/** @param {Point} newCenter */
 	setPosition(newCenter) {
-		this.position.center = newCenter;
+		this.loc.center = newCenter;
 		this.updateTransform();
 	}
 
@@ -97,7 +97,7 @@ class Card {
  * 
  * (Might want to dissolve this into a typedef...)
  */
-class CardPosition {
+class CardLoc {
 	constructor(center = { x: 0, y: 0 }, rotation = 0) {
 		/** @type {Point} */
 		this.center = center;
@@ -186,7 +186,7 @@ class CardPosition {
 
 	/**
 	 * Checks if this rectangle collides with another rectangle.
-	 * @param {CardPosition} otherPosition The other card's oriented rectangle.
+	 * @param {CardLoc} otherPosition The other card's oriented rectangle.
 	 * @returns {boolean} Whether this card collides with the other card.
 	 */
 	collidesWith(otherPosition) {
@@ -249,7 +249,7 @@ class CardPosition {
 	}
 }
 
-class EdgeSnap extends CardPosition {
+class EdgeSnap extends CardLoc {
 	/**
 	 * @param {Object} options
 	 * @param {Point} options.center
@@ -263,7 +263,7 @@ class EdgeSnap extends CardPosition {
 	}
 }
 
-class CombinedSnap extends CardPosition {
+class CombinedSnap extends CardLoc {
 	/**
 	 * @param {Object} options
 	 * @param {Point} options.center
@@ -278,6 +278,6 @@ class CombinedSnap extends CardPosition {
 }
 
 // window.Card = Card;
-// window.CardPosition = CardPosition;
+// window.CardLoc = CardLoc;
 // window.EdgeSnap = EdgeSnap;
 // window.CombinedSnap = CombinedSnap;

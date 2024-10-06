@@ -12,14 +12,14 @@ function getAllCards() {
 		.map(cardElement => cardByElement.get(cardElement));
 }
 
-/** @param {CardPosition} cardPosition */
+/** @param {CardLoc} cardPosition */
 function findSnap(cardPosition) {
 	const allSnaps = [];
 	let closestSnap = null;
 	let closestDistance = MAX_SNAP_DISTANCE;
 	const cards = getAllCards();
 	for (const otherCard of cards) {
-		const otherCardPosition = otherCard.position;
+		const otherCardPosition = otherCard.loc;
 		if (otherCardPosition === cardPosition) continue;
 		if (!document.body.contains(otherCard.element)) continue;
 		for (const snap of otherCardPosition.getSnaps()) {
@@ -77,7 +77,7 @@ function findCollisions(card) {
 	const collisions = [];
 	for (const otherCard of getAllCards()) {
 		if (otherCard === card) continue;
-		if (card.position.collidesWith(otherCard.position)) {
+		if (card.loc.collidesWith(otherCard.loc)) {
 			collisions.push(otherCard);
 		}
 	}
@@ -146,8 +146,8 @@ gameContainer.addEventListener('pointerdown', (event) => {
 		if (event.button === 0) {
 			draggingCard = card;
 			offset = {
-				x: event.clientX - draggingCard.position.center.x,
-				y: event.clientY - draggingCard.position.center.y
+				x: event.clientX - draggingCard.loc.center.x,
+				y: event.clientY - draggingCard.loc.center.y
 			};
 			document.body.classList.add('dragging');
 			cardElement.style.zIndex = ++topZIndex;
@@ -157,9 +157,9 @@ gameContainer.addEventListener('pointerdown', (event) => {
 			card.flip();
 		} else if (event.button === 1) {
 			// create cards at each snap location
-			for (const snap of card.position.getSnaps()) {
+			for (const snap of card.loc.getSnaps()) {
 				const newCard = new Card(card.suit, card.value);
-				newCard.position.rotation = snap.rotation; // before setPosition so it takes care of updating the visual
+				newCard.loc.rotation = snap.rotation; // before setPosition so it takes care of updating the visual
 				newCard.setPosition(snap.center);
 				cardByElement.set(newCard.element, newCard);
 				gameContainer.appendChild(newCard.element);
@@ -216,10 +216,10 @@ window.addEventListener('pointermove', (event) => {
 
 function updateDraggedCard({ clientX, clientY }) {
 	if (draggingCard) {
-		let targetPosition = new CardPosition({
+		let targetPosition = new CardLoc({
 			x: clientX - offset.x,
 			y: clientY - offset.y
-		}, draggingCard.position.rotation);
+		}, draggingCard.loc.rotation);
 		const snap = findSnap(targetPosition);
 		clearEdgeHighlights();
 		if (snap) {
