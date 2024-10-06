@@ -236,20 +236,20 @@ window.addEventListener('pointermove', (event) => {
 
 function updateDraggedCard({ clientX, clientY }) {
 	if (draggingCard) {
-		let targetPosition = new CardLoc({
+		let targetLoc = new CardLoc({
 			x: clientX - offset.x,
 			y: clientY - offset.y
 		}, draggingCard.targetVisualLoc.rotation);
-		const snap = findSnap(targetPosition, draggingCard);
+		const snap = findSnap(targetLoc, draggingCard);
 		clearEdgeHighlights();
 		if (snap) {
-			targetPosition = snap;
+			targetLoc = snap;
 			for (const edge of snap.edges) {
 				makeEdgeHighlight(edge);
 			}
 		}
-		Object.assign(draggingCard.targetVisualLoc.center, targetPosition.center);
-		Object.assign(draggingCard.visualLoc.center, targetPosition.center);
+		Object.assign(draggingCard.targetVisualLoc.center, targetLoc.center);
+		Object.assign(draggingCard.visualLoc.center, targetLoc.center);
 		draggingCard.updateTransform();
 		const collisions = findCollisions(draggingCard.targetVisualLoc, draggingCard);
 		draggingCard.element.classList.toggle('colliding', collisions.length > 0);

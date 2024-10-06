@@ -139,9 +139,7 @@ class Card {
 }
 
 /**
- * Represents a playing card's position and orientation. A 2D oriented bounding box.
- * 
- * (Might want to dissolve this into a typedef...)
+ * Represents a playing card's position and orientation. A 2D oriented box with a fixed size.
  */
 class CardLoc {
 	constructor(center = { x: 0, y: 0 }, rotation = 0) {
@@ -198,11 +196,13 @@ class CardLoc {
 	}
 
 	/** 
-	 * @returns {EdgeSnap[]} a list of snapping positions
-	 * relative to this card's edges, assuming the same dimensions for the card to be snapped.
-	 * For each side, there are two valid perpendicular snaps (aligning one corner, with an overhang),
+	 * @returns {EdgeSnap[]} a list of locations where another card (of equal dimensions) can be snapped to this card.
+	 * 
+	 * For each side, there are two valid perpendicular snaps (aligning one corner, with an overhang on the opposite side),
 	 * and one valid parallel snap (aligning two corners),
 	 * plus equivalent snaps for half-turn (180 degree) rotations of the card to be snapped.
+	 * By perpendicular snaps I mean snaps where the card is rotated 90 degrees from the card it's snapping to.
+	 * The equivalent snaps are not included in the list. External code should allow 180 degree rotations.
 	 */
 	getSnaps() {
 		const snaps = [];
@@ -247,14 +247,14 @@ class CardLoc {
 
 	/**
 	 * Checks if this rectangle collides with another rectangle.
-	 * @param {CardLoc} otherPosition The other card's oriented rectangle.
-	 * @returns {boolean} Whether this card collides with the other card.
+	 * @param {CardLoc} otherLoc Another card's oriented rectangle.
+	 * @returns {boolean} Whether the rectangles overlap.
 	 */
-	collidesWith(otherPosition) {
+	collidesWith(otherLoc) {
 		const verticesA = this.getCorners();
-		const verticesB = otherPosition.getCorners();
+		const verticesB = otherLoc.getCorners();
 		const centerA = this.center;
-		const centerB = otherPosition.center;
+		const centerB = otherLoc.center;
 
 		// Bounding circle check
 		const distanceBetweenCenters = Math.hypot(centerA.x - centerB.x, centerA.y - centerB.y);
