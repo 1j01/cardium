@@ -90,16 +90,16 @@ class CardLoc {
 		/** @type {Point} */
 		this.center = { x: 0, y: 0 };
 		Object.assign(this.center, center);
-		center = this.center; // for getter (Without this line, `cardLoc.center` would reference the `center` object passed in as an argument! I added a test for this.)
 
 		/** @type {number} */
 		this.rotation = rotation; // in degrees
 
 		// For safety, prevent re-assigning the center object
 		// Otherwise subtle bugs can be introduced, e.g. `visualLoc.center = targetVisualLoc.center` to skip an animation might prevent all future animations
+		const _center = this.center; // (don't want to use the `center` argument here, as reusing the object passed to the constructor would allow similar bugs)
 		Object.defineProperty(this, 'center', {
 			set: () => { throw new Error('Cannot re-assign center property. Use Object.assign to set x and y values to a new point.'); },
-			get: () => center, // (can't use this.center here, as it would recurse infinitely, calling the getter)
+			get: () => _center, // (can't use `this.center` here, as it would recurse infinitely, calling the getter)
 		});
 	}
 
