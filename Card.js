@@ -165,6 +165,35 @@ class CardLoc {
 		this.rotation = source.rotation;
 	}
 
+	/**
+	 * @param {number} deltaDegrees The amount to rotate by, in degrees.
+	 * @param {Point} [pivot=this.center] The point to rotate around.
+	 * @returns {CardLoc} A new CardLoc with the rotation applied.
+	 */
+	getRotatedLoc(deltaDegrees, pivot = this.center) {
+		const deltaRadians = deltaDegrees * Math.PI / 180;
+
+		// Translate the card so that the pivot becomes the origin
+		const translatedCenter = {
+			x: this.center.x - pivot.x,
+			y: this.center.y - pivot.y
+		};
+
+		// Rotate the translated center point
+		const rotatedCenter = {
+			x: translatedCenter.x * Math.cos(deltaRadians) - translatedCenter.y * Math.sin(deltaRadians),
+			y: translatedCenter.x * Math.sin(deltaRadians) + translatedCenter.y * Math.cos(deltaRadians)
+		};
+
+		// Translate the rotated center back to the original coordinate system
+		const newCenter = {
+			x: rotatedCenter.x + pivot.x,
+			y: rotatedCenter.y + pivot.y
+		};
+
+		return new CardLoc(newCenter, this.rotation + deltaDegrees);
+	}
+
 	/** @returns {[Point, Point, Point, Point]} */
 	getCorners() {
 		const rad = this.rotation * Math.PI / 180;
@@ -387,30 +416,7 @@ class RollerCard extends Card {
 				continue;
 			}
 
-			const deltaDegrees = 45;
-			const deltaRadians = deltaDegrees * Math.PI / 180;
-			const pivot = corner;
-
-			// Translate the card so that the pivot becomes the origin
-			const translatedCenter = {
-				x: this.logicalLoc.center.x - pivot.x,
-				y: this.logicalLoc.center.y - pivot.y
-			};
-
-			// Rotate the translated center point by 45 degrees around the origin (pivot)
-			const rotatedCenter = {
-				x: translatedCenter.x * Math.cos(deltaRadians) - translatedCenter.y * Math.sin(deltaRadians),
-				y: translatedCenter.x * Math.sin(deltaRadians) + translatedCenter.y * Math.cos(deltaRadians)
-			};
-
-			// Translate the rotated center back to the original pivot location
-			const newCenter = {
-				x: rotatedCenter.x + pivot.x,
-				y: rotatedCenter.y + pivot.y
-			};
-
-			// Create a new CardLoc with the rotated center and updated rotation angle
-			const rotatedLoc = new CardLoc(newCenter, this.logicalLoc.rotation + deltaDegrees);
+			const rotatedLoc = this.logicalLoc.getRotatedLoc(45, corner);
 
 			// Check if the rotation is valid
 			if (!findCollisions(rotatedLoc, this).length) {
