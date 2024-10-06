@@ -52,7 +52,7 @@ class Card {
 		return card;
 	}
 
-	updatePosition() {
+	updateTransform() {
 		const { center, rotation } = this.position;
 		this.element.style.transform = `translate(-50%, -50%) translate(${center.x}px, ${center.y}px) rotate(${rotation}deg) rotateY(${this._smoothedFlip}deg)`;
 	}
@@ -60,13 +60,13 @@ class Card {
 	/** @param {number} deltaDegrees */
 	rotate(deltaDegrees) {
 		this.position.rotation = (this.position.rotation + deltaDegrees + 360) % 360;
-		this.updatePosition();
+		this.updateTransform();
 	}
 
 	/** @param {Point} newCenter */
 	setPosition(newCenter) {
 		this.position.center = newCenter;
-		this.updatePosition();
+		this.updateTransform();
 	}
 
 	flip() {
@@ -83,7 +83,7 @@ class Card {
 			if (Math.abs(this._smoothedFlip - target) < 0.01) {
 				this._smoothedFlip = target;
 			}
-			this.updatePosition();
+			this.updateTransform();
 			if (this._smoothedFlip !== target) {
 				this._animId = requestAnimationFrame(animateFlip);
 			}
