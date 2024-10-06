@@ -27,4 +27,23 @@ function dealCards() {
 	}
 }
 
-dealCards();
+function clearBoard() {
+	for (const card of getAllCards()) {
+		card.element.remove();
+	}
+}
+
+function newGame() {
+	clearBoard();
+	dealCards();
+}
+
+function onKeyDown(event) {
+	if (event.key === 'r') {
+		newGame();
+	}
+}
+
+document.addEventListener('keydown', onKeyDown);
+
+newGame();
