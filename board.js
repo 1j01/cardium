@@ -12,22 +12,24 @@ function getAllCards() {
 		.map(cardElement => cardByElement.get(cardElement));
 }
 
-/** @param {CardLoc} cardPosition */
-function findSnap(cardPosition) {
+/**
+ * @param {CardLoc} cardLoc  location to check for snaps
+ * @param {Card} ignoreCard  card to exclude from snap detection
+ */
+function findSnap(cardLoc, ignoreCard) {
 	const allSnaps = [];
 	let closestSnap = null;
 	let closestDistance = MAX_SNAP_DISTANCE;
 	const cards = getAllCards();
 	for (const otherCard of cards) {
-		const otherCardPosition = otherCard.loc;
-		if (otherCardPosition === cardPosition) continue;
+		if (otherCard === ignoreCard) continue;
 		if (!document.body.contains(otherCard.element)) continue;
-		for (const snap of otherCardPosition.getSnaps()) {
-			const distance = Math.hypot(snap.center.x - cardPosition.center.x, snap.center.y - cardPosition.center.y);
+		for (const snap of otherCard.logicalLoc.getSnaps()) {
+			const distance = Math.hypot(snap.center.x - cardLoc.center.x, snap.center.y - cardLoc.center.y);
 			// Note: remainder operator only works here if
 			// the values are already constrained to within 0-360
 			// otherwise negative numbers would be a problem.
-			if (distance < closestDistance && (snap.rotation % 180) === (cardPosition.rotation % 180)) {
+			if (distance < closestDistance && (snap.rotation % 180) === (cardLoc.rotation % 180)) {
 				closestSnap = snap;
 				closestDistance = distance;
 			}
@@ -73,11 +75,15 @@ function findSnap(cardPosition) {
 	return combinedSnap;
 }
 
-function findCollisions(card) {
+/** 
+ * @param {CardLoc} cardLoc  location to check for collisions
+ * @param {Card} ignoreCard  card to exclude from collision detection
+ */
+function findCollisions(cardLoc, ignoreCard) {
 	const collisions = [];
 	for (const otherCard of getAllCards()) {
-		if (otherCard === card) continue;
-		if (card.loc.collidesWith(otherCard.loc)) {
+		if (otherCard === ignoreCard) continue;
+		if (cardLoc.collidesWith(otherCard.logicalLoc)) {
 			collisions.push(otherCard);
 		}
 	}
@@ -102,9 +108,13 @@ window.addEventListener('wheel', (event) => {
 	if (Math.abs(mouseWheelAccumulator) > 50) {
 		if (draggingCard) {
 			const deltaDegrees = Math.sign(mouseWheelAccumulator) * 45;
-			draggingCard.loc.rotation = (draggingCard.loc.rotation + deltaDegrees + 360) % 360;
+			// TODO: don't modulo 360 for the target rotation, since it's used for animation
+			// Instead, modulo any time angles are compared. (And do it robustly, handling negative numbers.)
+			draggingCard.targetVisualLoc.rotation = (draggingCard.targetVisualLoc.rotation + deltaDegrees + 360) % 360;
 			// Update snapped position and highlights and card transform
 			updateDraggedCard(event);
+			// Animate the rotation
+			draggingCard.animate();
 		}
 		mouseWheelAccumulator = 0;
 	}
@@ -148,8 +158,8 @@ gameContainer.addEventListener('pointerdown', (event) => {
 		if (event.button === 0) {
 			draggingCard = card;
 			offset = {
-				x: event.clientX - draggingCard.loc.center.x,
-				y: event.clientY - draggingCard.loc.center.y
+				x: event.clientX - draggingCard.visualLoc.center.x,
+				y: event.clientY - draggingCard.visualLoc.center.y
 			};
 			document.body.classList.add('dragging');
 			cardElement.style.zIndex = ++topZIndex;
@@ -159,11 +169,9 @@ gameContainer.addEventListener('pointerdown', (event) => {
 			card.flip();
 		} else if (event.button === 1) {
 			// create cards at each snap location
-			for (const snap of card.loc.getSnaps()) {
+			for (const snap of card.logicalLoc.getSnaps()) {
 				const newCard = new Card(card.suit, card.value);
-				newCard.loc.rotation = snap.rotation;
-				Object.assign(newCard.loc.center, snap.center);
-				newCard.updateTransform();
+				newCard.moveTo(snap, { animate: false });
 				cardByElement.set(newCard.element, newCard);
 				gameContainer.appendChild(newCard.element);
 			}
@@ -222,8 +230,8 @@ function updateDraggedCard({ clientX, clientY }) {
 		let targetPosition = new CardLoc({
 			x: clientX - offset.x,
 			y: clientY - offset.y
-		}, draggingCard.loc.rotation);
-		const snap = findSnap(targetPosition);
+		}, draggingCard.targetVisualLoc.rotation);
+		const snap = findSnap(targetPosition, draggingCard);
 		clearEdgeHighlights();
 		if (snap) {
 			targetPosition = snap;
@@ -231,23 +239,23 @@ function updateDraggedCard({ clientX, clientY }) {
 				makeEdgeHighlight(edge);
 			}
 		}
-		Object.assign(draggingCard.loc.center, targetPosition.center);
+		Object.assign(draggingCard.targetVisualLoc.center, targetPosition.center);
+		Object.assign(draggingCard.visualLoc.center, targetPosition.center);
 		draggingCard.updateTransform();
-		// TODO: give Card a logical position and a visual position
-		// so the visual position can move freely and then reset if it's invalid
-		// and the logical position can stay consistent for any game logic.
-		// Note: Dragging a card off a card does not currently
-		// update the visual for the other card, but
-		// it shouldn't be able to get into that state.
-		// Non-collision is not yet enforced.
-		const collisions = findCollisions(draggingCard);
+		const collisions = findCollisions(draggingCard.targetVisualLoc, draggingCard);
 		draggingCard.element.classList.toggle('colliding', collisions.length > 0);
 	}
 }
 
 window.addEventListener('pointerup', () => {
 	if (draggingCard) {
-		draggingCard.element.classList.remove('lifted');
+		const collisions = findCollisions(draggingCard.targetVisualLoc, draggingCard);
+		if (collisions.length > 0) {
+			draggingCard.moveTo(draggingCard.logicalLoc);
+		} else {
+			draggingCard.moveTo(draggingCard.targetVisualLoc);
+		}
+		draggingCard.element.classList.remove('lifted', 'colliding');
 		draggingCard = null;
 		document.body.classList.remove('dragging');
 	}

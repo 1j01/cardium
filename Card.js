@@ -16,6 +16,8 @@ document.body.style.setProperty('--card-height', `${CARD_HEIGHT}px`);
  */
 class Card {
 	FLIP_LERP_FACTOR = 0.1;
+	POSITION_LERP_FACTOR = 0.2;
+	ROTATION_LERP_FACTOR = 0.3;
 
 	constructor(suit, value) {
 		/** @type {'♠'|'♥'|'♦'|'♣'} */
@@ -23,7 +25,11 @@ class Card {
 		/** @type {'A'|'2'|'3'|'4'|'5'|'6'|'7'|'8'|'9'|'10'|'J'|'Q'|'K'} */
 		this.value = value;
 		/** @type {CardLoc} */
-		this.loc = new CardLoc();
+		this.logicalLoc = new CardLoc();
+		/** @type {CardLoc} */
+		this.visualLoc = new CardLoc();
+		/** @type {CardLoc} */
+		this.targetVisualLoc = new CardLoc();
 		/** @type {boolean} */
 		this.flipped = false;
 		/** @type {HTMLElement} */
@@ -53,30 +59,84 @@ class Card {
 	}
 
 	updateTransform() {
-		const { center, rotation } = this.loc;
+		const { center, rotation } = this.visualLoc;
 		this.element.style.transform = `translate(-50%, -50%) translate(${center.x}px, ${center.y}px) rotate(${rotation}deg) rotateY(${this._smoothedFlip}deg)`;
+	}
+
+	/**
+	 * Moves the card to a new location.
+	 * @param {CardLoc} newLoc The new location.
+	 * @param {Object} options
+	 * @param {boolean} [options.animate=true] Whether to animate the movement.
+	 */
+	moveTo(newLoc, { animate = true } = {}) {
+		this.logicalLoc.copy(newLoc);
+		this.targetVisualLoc.copy(newLoc);
+		if (animate) {
+			this.animate();
+		} else {
+			this.visualLoc.copy(newLoc);
+			this.updateTransform();
+		}
 	}
 
 	flip() {
 		this.flipped = !this.flipped;
 		this.element.classList.toggle('is-flipped', this.flipped);
+		this.animate();
+	}
+
+	/**
+	 * Animates the card's movement.
+	 * 
+	 * This should be called any time the card's targetVisualLoc changes separately from its visualLoc.
+	 * (Otherwise, you can just call updateTransform once.)
+	 * 
+	 * The animation loop will continue until the motion is settled.
+	 * 
+	 * This method is nearly idempotent. It won't start parallel animation loops, but will tick the animation forward each time it's called.
+	 * (Maybe I could return instead of canceling the animation frame if it's already animating...)
+	 * (Or if I make it use delta time, it also shouldn't matter if it's called many times, since repeated ticks would be super small.)
+	 */
+	animate() {
 		if (this._animId) {
-			cancelAnimationFrame(this._animId)
+			cancelAnimationFrame(this._animId);
 		}
-		const animateFlip = () => {
-			const target = this.flipped ? 180 : 0;
-			// TODO: use delta time, and perhaps a different easing function
-			// (Could use a CSS transition, but it would have to apply to the card faces (ugly) or a separate wrapper (ugly))
-			this._smoothedFlip += (target - this._smoothedFlip) * this.FLIP_LERP_FACTOR;
-			if (Math.abs(this._smoothedFlip - target) < 0.01) {
-				this._smoothedFlip = target;
-			}
-			this.updateTransform();
-			if (this._smoothedFlip !== target) {
-				this._animId = requestAnimationFrame(animateFlip);
-			}
+		// Note: might want to wait to animate flip until after move animation is complete, in the future
+		const targetFlip = this.flipped ? 180 : 0;
+		const targetCenter = this.targetVisualLoc.center;
+		const targetRotation = this.targetVisualLoc.rotation;
+
+		// TODO: use delta time, and perhaps a different easing function
+		// (Could use a CSS transition for flipping, but it would have to apply to the card faces (ugly) or a separate wrapper (ugly))
+		this._smoothedFlip += (targetFlip - this._smoothedFlip) * this.FLIP_LERP_FACTOR;
+		this.visualLoc.center.x += (targetCenter.x - this.visualLoc.center.x) * this.POSITION_LERP_FACTOR;
+		this.visualLoc.center.y += (targetCenter.y - this.visualLoc.center.y) * this.POSITION_LERP_FACTOR;
+		this.visualLoc.rotation += (targetRotation - this.visualLoc.rotation) * this.ROTATION_LERP_FACTOR;
+
+		if (Math.abs(this._smoothedFlip - targetFlip) < 0.01) {
+			this._smoothedFlip = targetFlip;
 		}
-		animateFlip();
+		if (Math.abs(this.visualLoc.center.x - targetCenter.x) < 0.01) {
+			this.visualLoc.center.x = targetCenter.x;
+		}
+		if (Math.abs(this.visualLoc.center.y - targetCenter.y) < 0.01) {
+			this.visualLoc.center.y = targetCenter.y;
+		}
+		if (Math.abs(this.visualLoc.rotation - targetRotation) < 0.01) {
+			this.visualLoc.rotation = targetRotation;
+		}
+
+		this.updateTransform();
+
+		if (
+			this._smoothedFlip !== targetFlip ||
+			this.visualLoc.center.x !== targetCenter.x ||
+			this.visualLoc.center.y !== targetCenter.y ||
+			this.visualLoc.rotation !== targetRotation
+		) {
+			this._animId = requestAnimationFrame(() => this.animate());
+		}
 	}
 }
 
@@ -101,6 +161,12 @@ class CardLoc {
 			set: () => { throw new Error('Cannot re-assign center property. Use Object.assign to set x and y values to a new point.'); },
 			get: () => _center, // (can't use `this.center` here, as it would recurse infinitely, calling the getter)
 		});
+	}
+
+	/** @param {CardLoc} source */
+	copy(source) {
+		Object.assign(this.center, source.center);
+		this.rotation = source.rotation;
 	}
 
 	/** @returns {[Point, Point, Point, Point]} */
