@@ -400,23 +400,37 @@ class RollerCard extends Card {
 	step() {
 		const cards = getAllCards();
 		// const snap = findSnap(this.logicalLoc, this);
-		for (const corner of this.logicalLoc.getCorners()) {
+		const pivots = this.logicalLoc.getCorners();
+		// Allow pivoting on edge as well
+		for (const edge of this.logicalLoc.getEdges()) {
+			// Only three fractions are possible with cards with a ratio of 2:3, corresponding to the corners of other cards that might be present along the edge.
+			// In fact, depending on the edge length, only the half or only the third fractions might be possible. I could differentiate...
+			// But this might be better implemented by actually looking at the cards present for corner pivots. I just don't want to think about doing that (efficiently) right now.
+			pivots.push(alongLine(edge, 1 / 2));
+			pivots.push(alongLine(edge, 2 / 3));
+			pivots.push(alongLine(edge, 1 / 3));
+		}
+		for (const pivot of pivots) {
 
-			// Check that corner is anchored to another card
+			// Check that pivot is anchored to another card
+			// (Some old, more strict behaviors commented out.)
+			// Most strict: corner of roller on a card's corner
 			// if (!snap?.edges.some(edge => edge.some(point => Math.hypot(point.x - corner.x, point.y - corner.y) < 1))) {
 			// 	continue;
 			// }
+			// Medium strict: corner of roller on a card's edge
 			// if (!cards.some((card) => card !== this && card.logicalLoc.getCorners().some((corner2) => Math.hypot(corner2.x - corner.x, corner2.y - corner.y) < 1))) {
 			// 	continue;
 			// }
+			// Most lenient: roller's edge on a card's edge
 			if (!cards.some((card) => card !== this && card.logicalLoc.getEdges().some((edge) => {
-				const closestPoint = closestPointOnLineSegment(corner, edge);
-				return Math.hypot(closestPoint.x - corner.x, closestPoint.y - corner.y) < 1;
+				const closestPoint = closestPointOnLineSegment(pivot, edge);
+				return Math.hypot(closestPoint.x - pivot.x, closestPoint.y - pivot.y) < 1;
 			}))) {
 				continue;
 			}
 
-			const rotatedLoc = this.logicalLoc.getRotatedLoc(45, corner);
+			const rotatedLoc = this.logicalLoc.getRotatedLoc(45, pivot);
 
 			// Check if the rotation is valid
 			if (!findCollisions(rotatedLoc, this).length) {

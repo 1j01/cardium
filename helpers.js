@@ -45,3 +45,11 @@ function closestPointOnLineSegment(point, lineSegment) {
 	t = Math.max(0, Math.min(1, t)); // remove this line to treat as infinite line
 	return { x: a.x + a_to_b.x * t, y: a.y + a_to_b.y * t };
 }
+
+function alongLine(lineSegment, fraction) {
+	const [a, b] = lineSegment;
+	return {
+		x: a.x + (b.x - a.x) * fraction,
+		y: a.y + (b.y - a.y) * fraction
+	};
+}
