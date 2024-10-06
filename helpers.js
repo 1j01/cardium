@@ -5,3 +5,7 @@ function shuffleArray(array) {
 		[array[i], array[j]] = [array[j], array[i]];
 	}
 }
+
+function mod(n, m) {
+	return ((n % m) + m) % m;
+}

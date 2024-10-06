@@ -102,7 +102,7 @@ window.addEventListener('wheel', (event) => {
 	if (Math.abs(mouseWheelAccumulator) > 50) {
 		if (draggingCard) {
 			const deltaDegrees = Math.sign(mouseWheelAccumulator) * 45;
-			draggingCard.loc.rotation = (draggingCard.loc.rotation + deltaDegrees + 360) % 360;
+			draggingCard.loc.rotation = mod(draggingCard.loc.rotation + deltaDegrees, 360);
 			// Update snapped position and highlights and card transform
 			updateDraggedCard(event);
 		}
