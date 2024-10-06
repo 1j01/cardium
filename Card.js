@@ -90,6 +90,8 @@ class CardLoc {
 		/** @type {Point} */
 		this.center = { x: 0, y: 0 };
 		Object.assign(this.center, center);
+		center = this.center; // for getter (Without this line, `cardLoc.center` would reference the `center` object passed in as an argument! I added a test for this.)
+
 		/** @type {number} */
 		this.rotation = rotation; // in degrees
 
@@ -97,7 +99,7 @@ class CardLoc {
 		// Otherwise subtle bugs can be introduced, e.g. `visualLoc.center = targetVisualLoc.center` to skip an animation might prevent all future animations
 		Object.defineProperty(this, 'center', {
 			set: () => { throw new Error('Cannot re-assign center property. Use Object.assign to set x and y values to a new point.'); },
-			get: () => center,
+			get: () => center, // (can't use this.center here, as it would recurse infinitely, calling the getter)
 		});
 	}
 
@@ -272,6 +274,21 @@ class CombinedSnap extends CardLoc {
 		this.edges = edges;
 	}
 }
+
+
+// Tests
+
+function testCardLoc() {
+	const centerArg = { x: 100, y: 200 };
+	const rotationArg = 45;
+	const loc = new CardLoc(centerArg, rotationArg);
+	console.assert(loc.center.x === centerArg.x);
+	console.assert(loc.center.y === centerArg.y);
+	console.assert(loc.rotation === rotationArg);
+	console.assert(loc.center !== centerArg);
+}
+
+testCardLoc();
 
 // window.Card = Card;
 // window.CardLoc = CardLoc;
