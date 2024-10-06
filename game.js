@@ -7,14 +7,15 @@ function dealCards() {
 	const deck = [];
 	for (const suit of suits) {
 		for (const value of values) {
-			deck.push({ suit, value });
+			deck.push(new StandardPlayingCard(suit, value));
 		}
 	}
 	shuffleArray(deck);
 
-	for (let i = 0; i < 12; i++) {
-		const { suit, value } = deck[i];
-		const card = new StandardPlayingCard(suit, value);
+	deck.push(new RollerCard());
+
+	// TODO: start cards flipped, in a stack, and auto-flip when picking them up
+	for (const card of deck) {
 		gameContainer.appendChild(card.element);
 		cardByElement.set(card.element, card);
 	}
@@ -34,6 +35,10 @@ function newGame() {
 function onKeyDown(event) {
 	if (event.key === 'r') {
 		newGame();
+	} else if (event.key === ' ') {
+		for (const card of getAllCards()) {
+			card.step?.();
+		}
 	}
 }
 

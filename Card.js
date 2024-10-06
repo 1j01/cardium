@@ -360,6 +360,62 @@ class StandardPlayingCard extends Card {
 	}
 }
 
+class RollerCard extends Card {
+	constructor() {
+		super();
+
+		this.front.style.color = 'purple';
+		this.front.textContent = '↻';
+	}
+
+	step() {
+		const cards = getAllCards();
+		// const snap = findSnap(this.logicalLoc, this);
+		for (const corner of this.logicalLoc.getCorners()) {
+
+			// Check that corner is anchored to another card
+			// if (!snap?.edges.some(edge => edge.some(point => Math.hypot(point.x - corner.x, point.y - corner.y) < 1))) {
+			// 	continue;
+			// }
+			if (!cards.some((card) => card !== this && card.logicalLoc.getCorners().some((corner2) => Math.hypot(corner2.x - corner.x, corner2.y - corner.y) < 1))) {
+				continue;
+			}
+
+			const deltaDegrees = 45;
+			const deltaRadians = deltaDegrees * Math.PI / 180;
+			const pivot = corner;
+
+			// Translate the card so that the pivot becomes the origin
+			const translatedCenter = {
+				x: this.logicalLoc.center.x - pivot.x,
+				y: this.logicalLoc.center.y - pivot.y
+			};
+
+			// Rotate the translated center point by 45 degrees around the origin (pivot)
+			const rotatedCenter = {
+				x: translatedCenter.x * Math.cos(deltaRadians) - translatedCenter.y * Math.sin(deltaRadians),
+				y: translatedCenter.x * Math.sin(deltaRadians) + translatedCenter.y * Math.cos(deltaRadians)
+			};
+
+			// Translate the rotated center back to the original pivot location
+			const newCenter = {
+				x: rotatedCenter.x + pivot.x,
+				y: rotatedCenter.y + pivot.y
+			};
+
+			// Create a new CardLoc with the rotated center and updated rotation angle
+			const rotatedLoc = new CardLoc(newCenter, this.logicalLoc.rotation + deltaDegrees);
+
+			// Check if the rotation is valid
+			if (!findCollisions(rotatedLoc, this).length) {
+				// TODO: improve animation; right now position and rotation are animated separately...
+				this.moveTo(rotatedLoc);
+				return;
+			}
+		}
+	}
+}
+
 
 // Tests
 
