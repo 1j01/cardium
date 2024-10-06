@@ -377,7 +377,13 @@ class RollerCard extends Card {
 			// if (!snap?.edges.some(edge => edge.some(point => Math.hypot(point.x - corner.x, point.y - corner.y) < 1))) {
 			// 	continue;
 			// }
-			if (!cards.some((card) => card !== this && card.logicalLoc.getCorners().some((corner2) => Math.hypot(corner2.x - corner.x, corner2.y - corner.y) < 1))) {
+			// if (!cards.some((card) => card !== this && card.logicalLoc.getCorners().some((corner2) => Math.hypot(corner2.x - corner.x, corner2.y - corner.y) < 1))) {
+			// 	continue;
+			// }
+			if (!cards.some((card) => card !== this && card.logicalLoc.getEdges().some((edge) => {
+				const closestPoint = closestPointOnLineSegment(corner, edge);
+				return Math.hypot(closestPoint.x - corner.x, closestPoint.y - corner.y) < 1;
+			}))) {
 				continue;
 			}
 
@@ -409,6 +415,9 @@ class RollerCard extends Card {
 			// Check if the rotation is valid
 			if (!findCollisions(rotatedLoc, this).length) {
 				// TODO: improve animation; right now position and rotation are animated separately...
+				// but I really want the center position to go in a slight arc, not a straight line
+				// (I want the pivot to stay anchored.)
+				// I could use similar logic for this rotation, with smaller steps, but I'm not sure how to best integrate it with the existing animation system.
 				this.moveTo(rotatedLoc);
 				return;
 			}

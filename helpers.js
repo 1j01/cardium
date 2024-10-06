@@ -28,3 +28,20 @@ function angleDifference(currentAngle, targetAngle) {
 	}
 	return diff;
 }
+
+/**
+ * @param {Point} point 
+ * @param {Edge} lineSegment
+ * @returns {Point} The point on the line segment closest to the given point.
+ */
+function closestPointOnLineSegment(point, lineSegment) {
+	// https://stackoverflow.com/a/3122532/2624876
+	const [a, b] = lineSegment;
+	const a_to_p = { x: point.x - a.x, y: point.y - a.y };
+	const a_to_b = { x: b.x - a.x, y: b.y - a.y };
+	const atb2 = a_to_b.x ** 2 + a_to_b.y ** 2;
+	const atp_dot_atb = a_to_p.x * a_to_b.x + a_to_p.y * a_to_b.y;
+	let t = atp_dot_atb / atb2;
+	t = Math.max(0, Math.min(1, t)); // remove this line to treat as infinite line
+	return { x: a.x + a_to_b.x * t, y: a.y + a_to_b.y * t };
+}
