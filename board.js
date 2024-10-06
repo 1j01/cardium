@@ -162,7 +162,7 @@ gameContainer.addEventListener('pointerdown', (event) => {
 			for (const snap of card.loc.getSnaps()) {
 				const newCard = new Card(card.suit, card.value);
 				newCard.loc.rotation = snap.rotation;
-				newCard.loc.center = snap.center;
+				Object.assign(newCard.loc.center, snap.center);
 				newCard.updateTransform();
 				cardByElement.set(newCard.element, newCard);
 				gameContainer.appendChild(newCard.element);
@@ -231,7 +231,7 @@ function updateDraggedCard({ clientX, clientY }) {
 				makeEdgeHighlight(edge);
 			}
 		}
-		draggingCard.loc.center = targetPosition.center;
+		Object.assign(draggingCard.loc.center, targetPosition.center);
 		draggingCard.updateTransform();
 		// TODO: give Card a logical position and a visual position
 		// so the visual position can move freely and then reset if it's invalid

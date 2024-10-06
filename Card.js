@@ -88,9 +88,17 @@ class Card {
 class CardLoc {
 	constructor(center = { x: 0, y: 0 }, rotation = 0) {
 		/** @type {Point} */
-		this.center = center;
+		this.center = { x: 0, y: 0 };
+		Object.assign(this.center, center);
 		/** @type {number} */
 		this.rotation = rotation; // in degrees
+
+		// For safety, prevent re-assigning the center object
+		// Otherwise subtle bugs can be introduced, e.g. `visualLoc.center = targetVisualLoc.center` to skip an animation might prevent all future animations
+		Object.defineProperty(this, 'center', {
+			set: () => { throw new Error('Cannot re-assign center property. Use Object.assign to set x and y values to a new point.'); },
+			get: () => center,
+		});
 	}
 
 	/** @returns {[Point, Point, Point, Point]} */
