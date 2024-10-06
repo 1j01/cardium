@@ -19,11 +19,7 @@ class Card {
 	POSITION_LERP_FACTOR = 0.2;
 	ROTATION_LERP_FACTOR = 0.3;
 
-	constructor(suit, value) {
-		/** @type {'♠'|'♥'|'♦'|'♣'} */
-		this.suit = suit;
-		/** @type {'A'|'2'|'3'|'4'|'5'|'6'|'7'|'8'|'9'|'10'|'J'|'Q'|'K'} */
-		this.value = value;
+	constructor() {
 		/** @type {CardLoc} */
 		this.logicalLoc = new CardLoc();
 		/** @type {CardLoc} */
@@ -34,6 +30,10 @@ class Card {
 		this.flipped = false;
 		/** @type {HTMLElement} */
 		this.element = this.createElement();
+		/** @type {HTMLElement} */
+		this.front = this.element.querySelector('.card-front');
+		/** @type {HTMLElement} */
+		this.back = this.element.querySelector('.card-back');
 		/** @type {number} */
 		this._smoothedFlip = 0
 		/** @type {number} */
@@ -46,8 +46,6 @@ class Card {
 
 		const front = document.createElement('div');
 		front.classList.add('card-face', 'card-front');
-		front.style.color = (this.suit === '♥' || this.suit === '♦') ? 'red' : 'black';
-		front.textContent = `${this.value}${this.suit}`;
 
 		const back = document.createElement('div');
 		back.classList.add('card-face', 'card-back');
@@ -337,6 +335,28 @@ class CombinedSnap extends CardLoc {
 		super(center, rotation);
 		/** @type {Edge[]} */
 		this.edges = edges;
+	}
+}
+
+
+// Should I use composition instead of inheritance?
+// It feels like "StandardPlayingCard" should be a "Card" if named as such,
+// but thinking about adding more types, it might make more sense to have a Player that owns a Card, rather than a PlayerCard that is a Card, etc.
+class StandardPlayingCard extends Card {
+	/**
+	 * @param {'♠'|'♥'|'♦'|'♣'} suit
+	 * @param {'A'|'2'|'3'|'4'|'5'|'6'|'7'|'8'|'9'|'10'|'J'|'Q'|'K'} value
+	 */
+	constructor(suit, value) {
+		super();
+
+		/** @type {'♠'|'♥'|'♦'|'♣'} */
+		this.suit = suit;
+		/** @type {'A'|'2'|'3'|'4'|'5'|'6'|'7'|'8'|'9'|'10'|'J'|'Q'|'K'} */
+		this.value = value;
+
+		this.front.style.color = (this.suit === '♥' || this.suit === '♦') ? 'red' : 'black';
+		this.front.textContent = `${this.value}${this.suit}`;
 	}
 }
 

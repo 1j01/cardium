@@ -14,7 +14,7 @@ function dealCards() {
 
 	for (let i = 0; i < 12; i++) {
 		const { suit, value } = deck[i];
-		const card = new Card(suit, value);
+		const card = new StandardPlayingCard(suit, value);
 		gameContainer.appendChild(card.element);
 		cardByElement.set(card.element, card);
 	}

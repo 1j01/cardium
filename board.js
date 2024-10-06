@@ -177,7 +177,7 @@ gameContainer.addEventListener('pointerdown', (event) => {
 		} else if (event.button === 1) {
 			// create cards at each snap location
 			for (const snap of card.logicalLoc.getSnaps()) {
-				const newCard = new Card(card.suit, card.value);
+				const newCard = card instanceof StandardPlayingCard ? new StandardPlayingCard(card.suit, card.value) : new Card();
 				newCard.moveTo(snap, { animate: false });
 				cardByElement.set(newCard.element, newCard);
 				gameContainer.appendChild(newCard.element);
