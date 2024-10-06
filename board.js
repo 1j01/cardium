@@ -100,10 +100,12 @@ window.addEventListener('wheel', (event) => {
 	// I also tested this on a laptop with a touchpad to make sure it felt reasonable with continuous scrolling.
 	// Devices may vary, though.
 	if (Math.abs(mouseWheelAccumulator) > 50) {
-		draggingCard?.rotate(Math.sign(mouseWheelAccumulator) * 45);
-		// Update snapped position and highlights
-		updateDraggedCard(event);
-
+		if (draggingCard) {
+			const deltaDegrees = Math.sign(mouseWheelAccumulator) * 45;
+			draggingCard.loc.rotation = (draggingCard.loc.rotation + deltaDegrees + 360) % 360;
+			// Update snapped position and highlights and card transform
+			updateDraggedCard(event);
+		}
 		mouseWheelAccumulator = 0;
 	}
 });
@@ -159,8 +161,9 @@ gameContainer.addEventListener('pointerdown', (event) => {
 			// create cards at each snap location
 			for (const snap of card.loc.getSnaps()) {
 				const newCard = new Card(card.suit, card.value);
-				newCard.loc.rotation = snap.rotation; // before setPosition so it takes care of updating the visual
-				newCard.setPosition(snap.center);
+				newCard.loc.rotation = snap.rotation;
+				newCard.loc.center = snap.center;
+				newCard.updateTransform();
 				cardByElement.set(newCard.element, newCard);
 				gameContainer.appendChild(newCard.element);
 			}
@@ -228,7 +231,8 @@ function updateDraggedCard({ clientX, clientY }) {
 				makeEdgeHighlight(edge);
 			}
 		}
-		draggingCard.setPosition(targetPosition.center);
+		draggingCard.loc.center = targetPosition.center;
+		draggingCard.updateTransform();
 		// TODO: give Card a logical position and a visual position
 		// so the visual position can move freely and then reset if it's invalid
 		// and the logical position can stay consistent for any game logic.

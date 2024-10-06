@@ -57,18 +57,6 @@ class Card {
 		this.element.style.transform = `translate(-50%, -50%) translate(${center.x}px, ${center.y}px) rotate(${rotation}deg) rotateY(${this._smoothedFlip}deg)`;
 	}
 
-	/** @param {number} deltaDegrees */
-	rotate(deltaDegrees) {
-		this.loc.rotation = (this.loc.rotation + deltaDegrees + 360) % 360;
-		this.updateTransform();
-	}
-
-	/** @param {Point} newCenter */
-	setPosition(newCenter) {
-		this.loc.center = newCenter;
-		this.updateTransform();
-	}
-
 	flip() {
 		this.flipped = !this.flipped;
 		this.element.classList.toggle('is-flipped', this.flipped);
