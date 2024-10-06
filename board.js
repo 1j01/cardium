@@ -6,10 +6,19 @@ window.cardByElement = cardByElement;
 
 const MAX_SNAP_DISTANCE = 20;
 const SNAP_EQUIVALENCE_THRESHOLD = 0.1;
+const ANGLE_EQUIVALENCE_THRESHOLD = 0.1;
 
 function getAllCards() {
 	return [...document.querySelectorAll('.card')]
 		.map(cardElement => cardByElement.get(cardElement));
+}
+
+function anglesNearEqualOrOpposite(angle1, angle2) {
+	// Alternatively, could add a cycle parameter to angleDifference, and use 180 as the cycle. Would probably want to rename it cyclicDifference or something.
+	return (
+		Math.abs(angleDifference(angle1, angle2)) < ANGLE_EQUIVALENCE_THRESHOLD ||
+		Math.abs(angleDifference(angle1, angle2 + 180)) < ANGLE_EQUIVALENCE_THRESHOLD
+	);
 }
 
 /**
@@ -26,10 +35,10 @@ function findSnap(cardLoc, ignoreCard) {
 		if (!document.body.contains(otherCard.element)) continue;
 		for (const snap of otherCard.logicalLoc.getSnaps()) {
 			const distance = Math.hypot(snap.center.x - cardLoc.center.x, snap.center.y - cardLoc.center.y);
-			// Note: remainder operator only works here if
-			// the values are already constrained to within 0-360
-			// otherwise negative numbers would be a problem.
-			if (distance < closestDistance && (snap.rotation % 180) === (cardLoc.rotation % 180)) {
+			if (
+				distance < closestDistance &&
+				anglesNearEqualOrOpposite(snap.rotation, cardLoc.rotation)
+			) {
 				closestSnap = snap;
 				closestDistance = distance;
 			}
@@ -50,7 +59,7 @@ function findSnap(cardLoc, ignoreCard) {
 	for (const snap of allSnaps) {
 		if (
 			Math.hypot(snap.center.x - combinedSnap.center.x, snap.center.y - combinedSnap.center.y) < SNAP_EQUIVALENCE_THRESHOLD &&
-			(snap.rotation % 180) === (combinedSnap.rotation % 180)
+			anglesNearEqualOrOpposite(snap.rotation, combinedSnap.rotation)
 		) {
 			combinedSnap.edges.push(snap.edge);
 		}
@@ -108,9 +117,7 @@ window.addEventListener('wheel', (event) => {
 	if (Math.abs(mouseWheelAccumulator) > 50) {
 		if (draggingCard) {
 			const deltaDegrees = Math.sign(mouseWheelAccumulator) * 45;
-			// TODO: don't modulo 360 for the target rotation, since it's used for animation
-			// Instead, modulo any time angles are compared. (And do it robustly, handling negative numbers.)
-			draggingCard.targetVisualLoc.rotation = (draggingCard.targetVisualLoc.rotation + deltaDegrees + 360) % 360;
+			draggingCard.targetVisualLoc.rotation += deltaDegrees;
 			// Update snapped position and highlights and card transform
 			updateDraggedCard(event);
 			// Animate the rotation

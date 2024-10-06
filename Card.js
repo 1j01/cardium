@@ -238,8 +238,7 @@ class CardLoc {
 						x: midX + perpendicular.x * anotherDist + parallel.x * sign * mixedDist,
 						y: midY + perpendicular.y * anotherDist + parallel.y * sign * mixedDist,
 					},
-					// rotation: this.rotation + 90 * sign,
-					rotation: (this.rotation + 90) % 360,
+					rotation: this.rotation + 90 * sign,
 					edge,
 				}));
 			});
