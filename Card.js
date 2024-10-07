@@ -35,9 +35,9 @@ class Card {
 		/** @type {HTMLElement} */
 		this.back = this.element.querySelector('.card-back');
 		/** @type {number} */
-		this._smoothedFlip = 0
+		this._smoothedFlip = 0;
 		/** @type {number} */
-		this._animId = 0
+		this._animId = 0;
 	}
 
 	createElement() {
