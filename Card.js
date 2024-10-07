@@ -470,6 +470,15 @@ class FractalCard extends Card {
 				// Insert so the new card is visually below the originating card.
 				// This gives a more convincing effect, where you can imagine (infinite) cards were hidden behind the fractal card.
 				gameContainer.prepend(newCard.element);
+			} else {
+				// Debug visualization
+				// This helps clarify why asymmetry is introduced.
+				const newCard = new Card();
+				newCard.element.classList.add("snap-location-visualization");
+				newCard.moveTo(this.logicalLoc, { animate: false });
+				newCard.moveTo(spawnLoc, { animate: true });
+				cardByElement.set(newCard.element, newCard);
+				gameContainer.appendChild(newCard.element);
 			}
 		}
 		// Disable the fractal card after one use
