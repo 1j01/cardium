@@ -482,6 +482,23 @@ class PlayerCard extends Card {
 	}
 
 	/**
+	 * @NOTE This method is not used for pivoting over corners, only for walking.
+	 * @param {CardLoc} newLoc
+	 * @returns {boolean} Whether the card can move to the given location.
+	 */
+	walkable(newLoc) {
+		if (findCollisions(newLoc, this).length) {
+			return false;
+		}
+		const downAngle = this.logicalLoc.rotation + 90;
+		const newFooting = {
+			x: newLoc.center.x + Math.cos(downAngle * Math.PI / 180) * CARD_HEIGHT / 2,
+			y: newLoc.center.y + Math.sin(downAngle * Math.PI / 180) * CARD_HEIGHT / 2,
+		};
+		return this.groundAt(newFooting);
+	}
+
+	/**
 	 * @param {-1|1} direction 
 	 */
 	walk(direction) {
@@ -489,21 +506,14 @@ class PlayerCard extends Card {
 		const walkAngle = this.logicalLoc.rotation;
 		const dx = walkDistance * Math.cos(walkAngle * Math.PI / 180) * direction;
 		const dy = walkDistance * Math.sin(walkAngle * Math.PI / 180) * direction;
-		const newCenter = { x: this.logicalLoc.center.x + dx, y: this.logicalLoc.center.y + dy };
-		const newLoc = new CardLoc(newCenter, this.logicalLoc.rotation);
-		if (!findCollisions(newLoc, this).length) {
-			const downAngle = walkAngle + 90;
-			const newFooting = {
-				x: newCenter.x + Math.cos(downAngle * Math.PI / 180) * CARD_HEIGHT / 2,
-				y: newCenter.y + Math.sin(downAngle * Math.PI / 180) * CARD_HEIGHT / 2,
-			};
-			if (this.groundAt(newFooting)) {
-				this.moveTo(newLoc);
-				return;
-			}
+		const forwardCenter = { x: this.logicalLoc.center.x + dx, y: this.logicalLoc.center.y + dy };
+		const forwardLoc = new CardLoc(forwardCenter, this.logicalLoc.rotation);
+		if (this.walkable(forwardLoc)) {
+			this.moveTo(forwardLoc);
+			return;
 		}
 
-		// TODO: rotate upright in priority to rolling forward
+		// TODO: try to rotate upright before rolling forward
 		// maybe step up/down if there's a step
 
 		// TODO: DRY with RollerCard
