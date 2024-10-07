@@ -454,10 +454,12 @@ class FractalCard extends Card {
 		this.front.textContent = '∞';
 	}
 
+	getSpawnLocations() {
+		return this.logicalLoc.getCorners().map(corner => this.logicalLoc.getRotatedLoc(90, corner));
+	}
+
 	step() {
-		const pivots = this.logicalLoc.getCorners();
-		for (const pivot of pivots) {
-			const spawnLoc = this.logicalLoc.getRotatedLoc(90, pivot);
+		for (const spawnLoc of this.getSpawnLocations()) {
 			if (!findCollisions(spawnLoc, this).length) {
 				// TODO: clean way for cards to create new cards
 				const newCard = new FractalCard();
