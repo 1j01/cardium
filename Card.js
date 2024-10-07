@@ -466,7 +466,10 @@ class FractalCard extends Card {
 				newCard.moveTo(this.logicalLoc, { animate: false });
 				newCard.moveTo(spawnLoc, { animate: true });
 				cardByElement.set(newCard.element, newCard);
-				gameContainer.appendChild(newCard.element);
+				// gameContainer.appendChild(newCard.element);
+				// Insert so the new card is visually below the originating card.
+				// This gives a more convincing effect, where you can imagine (infinite) cards were hidden behind the fractal card.
+				gameContainer.prepend(newCard.element);
 			}
 		}
 		// Disable the fractal card after one use
