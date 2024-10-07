@@ -455,7 +455,18 @@ class FractalCard extends Card {
 	}
 
 	getSpawnLocations() {
-		return this.logicalLoc.getCorners().map(corner => this.logicalLoc.getRotatedLoc(90, corner));
+		// Simple Diamond
+		// return this.logicalLoc.getSnaps().filter(snap => snap.rotation === this.logicalLoc.rotation);
+
+		// Symmetrical for first iteration, but not for subsequent iterations
+		// due to collisions
+		// return this.logicalLoc.getCorners().map(corner => this.logicalLoc.getRotatedLoc(90, corner));
+
+		// Asymmetrical but kinda cool, creates arrow patterns in negative space that remind me of Conway's Game of Life
+		// return this.logicalLoc.getCorners().map(corner => this.logicalLoc.getRotatedLoc(90, corner)).slice(0, 3);
+
+		// Symmetrical braid-like pattern. Every other iteration is a rectangle or a square, overall, in both cases with a 5:1 slant.
+		return this.logicalLoc.getCorners().filter((_, index) => index % 2 === 0).map(corner => this.logicalLoc.getRotatedLoc(90, corner)).slice(0, 3)
 	}
 
 	step() {
