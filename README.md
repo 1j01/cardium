@@ -1,11 +1,12 @@
 # Cardium
 
-Game prototype with roller cards that can rotate around the perimeter of other cards.
+Game prototype with cards that can rotate around the perimeter of other cards.
 
 ## Implemented
 
 - Drag and drop cards, rotating with mouse wheel
 - Cards snap to other cards' edges, with highlights
+- Player card that can move around corners (press left/right arrow keys to move)
 - Roller card that follows the perimeter of other cards (press space to take a turn)
 - Fractal card that creates new cards every turn
 - Right click to flip cards over (flipped cards do nothing on their turn)
@@ -44,7 +45,6 @@ Game prototype with roller cards that can rotate around the perimeter of other c
   - Resource trains (cards feeding adjacent cards with resources)
   - Gun/gunner card
   - Excavation/revival card that uncovers flipped cards that it touches
-  - Player card that can move around corners but doesn't roll, only rotates when going over corners; could be basis for enemies / other cards as well
   - Action card sequencing like in Shogun Showdown (but maybe you could also include non-"action" cards where the action would be to place the card, and maybe you could even rotate the card in the action stack to place it rotated?? That bit might be hard to visualize / plan for while playing.)  
 
 

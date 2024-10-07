@@ -17,6 +17,7 @@ function dealCards() {
 	deck.push(new RollerCard(90));
 	deck.push(new RollerCard(-90));
 	deck.push(new FractalCard());
+	deck.push(new PlayerCard());
 
 	// TODO: start cards flipped, in a stack, and auto-flip when picking them up
 	for (const card of deck) {
@@ -43,6 +44,12 @@ function onKeyDown(event) {
 		for (const card of getAllCards()) {
 			if (!card.flipped) {
 				card.step?.();
+			}
+		}
+	} else if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
+		for (const card of getAllCards()) {
+			if (!card.flipped) {
+				card.walk?.(event.key === 'ArrowRight' ? 1 : -1);
 			}
 		}
 	}

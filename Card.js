@@ -457,6 +457,97 @@ class RollerCard extends Card {
 	}
 }
 
+class PlayerCard extends Card {
+	constructor() {
+		super();
+
+		this.renderFront();
+	}
+
+	renderFront() {
+		this.front.style.color = 'red';
+		this.front.textContent = "𖨆";
+	}
+
+	/**
+	 * @TODO DRY with RollerCard
+	 * @param {Point} point 
+	 * @returns {boolean} Whether a card's edge or corner exists at the given point (ignoring this card).
+	 */
+	groundAt(point, cards = getAllCards()) {
+		return cards.some((card) => card !== this && card.logicalLoc.getEdges().some((edge) => {
+			const closestPoint = closestPointOnLineSegment(point, edge);
+			return Math.hypot(closestPoint.x - point.x, closestPoint.y - point.y) < 1;
+		}));
+	}
+
+	/**
+	 * @param {-1|1} direction 
+	 */
+	walk(direction) {
+		const walkDistance = 50;
+		const walkAngle = this.logicalLoc.rotation;
+		const dx = walkDistance * Math.cos(walkAngle * Math.PI / 180) * direction;
+		const dy = walkDistance * Math.sin(walkAngle * Math.PI / 180) * direction;
+		const newCenter = { x: this.logicalLoc.center.x + dx, y: this.logicalLoc.center.y + dy };
+		const newLoc = new CardLoc(newCenter, this.logicalLoc.rotation);
+		if (!findCollisions(newLoc, this).length) {
+			const downAngle = walkAngle + 90;
+			const newFooting = {
+				x: newCenter.x + Math.cos(downAngle * Math.PI / 180) * CARD_HEIGHT / 2,
+				y: newCenter.y + Math.sin(downAngle * Math.PI / 180) * CARD_HEIGHT / 2,
+			};
+			if (this.groundAt(newFooting)) {
+				this.moveTo(newLoc);
+				return;
+			}
+		}
+
+		// TODO: rotate upright in priority to rolling forward
+		// maybe step up/down if there's a step
+
+		// TODO: DRY with RollerCard
+		const pivots = this.logicalLoc.getCorners();
+		// Allow pivoting on edge as well
+		for (const edge of this.logicalLoc.getEdges()) {
+			// Only three fractions are possible with cards with a ratio of 2:3, corresponding to the corners of other cards that might be present along the edge.
+			// In fact, depending on the edge length, only the half or only the third fractions might be possible. I could differentiate...
+			// But this might be better implemented by actually looking at the cards present for corner pivots. I just don't want to think about doing that (efficiently) right now.
+			pivots.push(alongLine(edge, 1 / 2));
+			pivots.push(alongLine(edge, 2 / 3));
+			pivots.push(alongLine(edge, 1 / 3));
+		}
+		for (const pivot of pivots) {
+			if (!this.groundAt(pivot)) {
+				continue;
+			}
+
+			const rotatedLoc = this.logicalLoc.getRotatedLoc(45 * direction, pivot);
+
+			if (!findCollisions(rotatedLoc, this).length) {
+				// TODO: anchor the pivot point during animation
+				this.moveTo(rotatedLoc);
+				return;
+			}
+		}
+
+		// Animate "bump" if no move is possible
+		// Could _perhaps_ improve this with an animation queue, so it can animate forwards and then backwards,
+		// although smoother isn't always better. It actually looks pretty good already.
+		// Could also DRY by adding a getTranslatedLoc method to CardLoc and maybe a helper function to get a rotated point
+		// or a vector math library...
+		{
+			const bumpDistance = 10;
+			const dx = bumpDistance * Math.cos(walkAngle * Math.PI / 180) * direction;
+			const dy = bumpDistance * Math.sin(walkAngle * Math.PI / 180) * direction;
+			const newCenter = { x: this.logicalLoc.center.x + dx, y: this.logicalLoc.center.y + dy };
+			const newLoc = new CardLoc(newCenter, this.logicalLoc.rotation);
+			this.visualLoc.copy(newLoc);
+			this.animate();
+		}
+	}
+}
+
 class FractalCard extends Card {
 	constructor() {
 		super();
