@@ -467,6 +467,8 @@ class FractalCard extends Card {
 				gameContainer.appendChild(newCard.element);
 			}
 		}
+		// Disable the fractal card after one use
+		this.flip();
 	}
 }
 
