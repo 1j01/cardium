@@ -38,7 +38,9 @@ function onKeyDown(event) {
 		newGame();
 	} else if (event.key === ' ') {
 		for (const card of getAllCards()) {
-			card.step?.();
+			if (!card.flipped) {
+				card.step?.();
+			}
 		}
 	}
 }
