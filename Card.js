@@ -395,8 +395,13 @@ class RollerCard extends Card {
 
 		this.deltaAngle = deltaAngle;
 
+		this.renderFront();
+	}
+
+	renderFront() {
 		this.front.style.color = 'purple';
-		this.front.textContent = Math.abs(deltaAngle) === 90 ? (deltaAngle > 0 ? "↱" : "↰") : (deltaAngle > 0 ? "↻" : "↺");
+		const a = this.deltaAngle;
+		this.front.textContent = Math.abs(a) === 90 ? (a > 0 ? "↱" : "↰") : (a > 0 ? "↻" : "↺");
 	}
 
 	step() {
@@ -444,6 +449,11 @@ class RollerCard extends Card {
 				return;
 			}
 		}
+		// Disable roller card when it can't move
+		// this.flip();
+		// Or, reverse direction
+		this.deltaAngle *= -1;
+		this.renderFront();
 	}
 }
 
