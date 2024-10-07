@@ -513,8 +513,37 @@ class PlayerCard extends Card {
 			return;
 		}
 
+		// Step up/down if there's a step
+		// TODO: find arbitrary step up/down height within margins
+		// See https://github.com/1j01/janitorial-android/blob/62acc45bc896c4b02e495751dce5bff401987475/src/game.js#L4097-L4152
+		// TODO: disable step down as a means to jump gaps while upside down (a sort of handstand jumping trick)
+		// perhaps by ensuring the player's bottom edge is on the ground before stepping down
+		{
+			const upAngle = walkAngle - 90;
+			const downAngle = walkAngle + 90;
+			const stepUpLoc = new CardLoc({
+				x: forwardCenter.x + Math.cos(upAngle * Math.PI / 180) * CARD_HEIGHT / 3,
+				y: forwardCenter.y + Math.sin(upAngle * Math.PI / 180) * CARD_HEIGHT / 3,
+			}, this.logicalLoc.rotation);
+			const stepDownLoc = new CardLoc({
+				x: forwardCenter.x + Math.cos(downAngle * Math.PI / 180) * CARD_HEIGHT / 3,
+				y: forwardCenter.y + Math.sin(downAngle * Math.PI / 180) * CARD_HEIGHT / 3,
+			}, this.logicalLoc.rotation);
+
+			if (this.walkable(stepUpLoc)) {
+				this.moveTo(stepUpLoc);
+				return;
+			}
+			if (this.walkable(stepDownLoc)) {
+				this.moveTo(stepDownLoc);
+				return;
+			}
+		}
+
 		// TODO: try to rotate upright before rolling forward
-		// maybe step up/down if there's a step
+		// TODO (maybe related): avoid rotating to where the player is only touching a corner
+		// (maybe try translating backward along the edge that the pivot is on, after rotating?
+		// uh... if the pivot is a corner, would have to find the correct edge...)
 
 		// TODO: DRY with RollerCard
 		const pivots = this.logicalLoc.getCorners();
