@@ -13,6 +13,7 @@ function dealCards() {
 	shuffleArray(deck);
 
 	deck.push(new RollerCard());
+	deck.push(new FractalCard());
 
 	// TODO: start cards flipped, in a stack, and auto-flip when picking them up
 	for (const card of deck) {

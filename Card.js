@@ -445,6 +445,31 @@ class RollerCard extends Card {
 	}
 }
 
+class FractalCard extends Card {
+	constructor() {
+		super();
+
+		this.element.classList.add('fractal-card');
+		this.front.style.color = 'green';
+		this.front.textContent = '∞';
+	}
+
+	step() {
+		const pivots = this.logicalLoc.getCorners();
+		for (const pivot of pivots) {
+			const spawnLoc = this.logicalLoc.getRotatedLoc(90, pivot);
+			if (!findCollisions(spawnLoc, this).length) {
+				// TODO: clean way for cards to create new cards
+				const newCard = new FractalCard();
+				newCard.moveTo(this.logicalLoc, { animate: false });
+				newCard.moveTo(spawnLoc, { animate: true });
+				cardByElement.set(newCard.element, newCard);
+				gameContainer.appendChild(newCard.element);
+			}
+		}
+	}
+}
+
 
 // Tests
 
