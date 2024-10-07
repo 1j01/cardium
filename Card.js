@@ -390,11 +390,13 @@ class StandardPlayingCard extends Card {
 }
 
 class RollerCard extends Card {
-	constructor() {
+	constructor(deltaAngle = 45) {
 		super();
 
+		this.deltaAngle = deltaAngle;
+
 		this.front.style.color = 'purple';
-		this.front.textContent = '↻';
+		this.front.textContent = Math.abs(deltaAngle) === 90 ? (deltaAngle > 0 ? "↱" : "↰") : (deltaAngle > 0 ? "↻" : "↺");
 	}
 
 	step() {
@@ -430,7 +432,7 @@ class RollerCard extends Card {
 				continue;
 			}
 
-			const rotatedLoc = this.logicalLoc.getRotatedLoc(45, pivot);
+			const rotatedLoc = this.logicalLoc.getRotatedLoc(this.deltaAngle, pivot);
 
 			// Check if the rotation is valid
 			if (!findCollisions(rotatedLoc, this).length) {
