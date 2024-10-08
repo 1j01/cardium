@@ -1,12 +1,12 @@
 
-function shuffleArray(array) {
+export function shuffleArray(array) {
 	for (let i = array.length - 1; i >= 0; i--) {
 		const j = Math.floor(Math.random() * (i + 1));
 		[array[i], array[j]] = [array[j], array[i]];
 	}
 }
 
-function mod(n, m) {
+export function mod(n, m) {
 	return ((n % m) + m) % m;
 }
 
@@ -17,7 +17,7 @@ function mod(n, m) {
  * @returns {number} The signed difference between the angles in degrees.
  * @see https://stackoverflow.com/a/69593373/2624876
  */
-function angleDifference(currentAngle, targetAngle) {
+export function angleDifference(currentAngle, targetAngle) {
 	// Subtract the angles, constraining the value to [0, 360)
 	let diff = mod(targetAngle - currentAngle, 360);
 
@@ -30,11 +30,11 @@ function angleDifference(currentAngle, targetAngle) {
 }
 
 /**
- * @param {Point} point 
- * @param {Edge} lineSegment
- * @returns {Point} The point on the line segment closest to the given point.
+ * @param {import("./Card").Point} point 
+ * @param {import("./Card").Edge} lineSegment
+ * @returns {import("./Card").Point} The point on the line segment closest to the given point.
  */
-function closestPointOnLineSegment(point, lineSegment) {
+export function closestPointOnLineSegment(point, lineSegment) {
 	// https://stackoverflow.com/a/3122532/2624876
 	const [a, b] = lineSegment;
 	const a_to_p = { x: point.x - a.x, y: point.y - a.y };
@@ -46,7 +46,7 @@ function closestPointOnLineSegment(point, lineSegment) {
 	return { x: a.x + a_to_b.x * t, y: a.y + a_to_b.y * t };
 }
 
-function alongLine(lineSegment, fraction) {
+export function alongLine(lineSegment, fraction) {
 	const [a, b] = lineSegment;
 	return {
 		x: a.x + (b.x - a.x) * fraction,

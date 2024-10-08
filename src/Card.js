@@ -1,3 +1,6 @@
+import { cardByElement, findCollisions, gameContainer, getAllCards } from "./board.js";
+import { alongLine, closestPointOnLineSegment } from "./helpers.js";
+
 const CARD_WIDTH = 100;
 const CARD_HEIGHT = 150;
 const CARD_MEAN_SIDE_LENGTH = (CARD_WIDTH + CARD_HEIGHT) / 2;
@@ -14,7 +17,7 @@ document.body.style.setProperty('--card-height', `${CARD_HEIGHT}px`);
 /**
  * Represents a playing card.
  */
-class Card {
+export class Card {
 	FLIP_LERP_FACTOR = 0.1;
 	POSITION_LERP_FACTOR = 0.2;
 	ROTATION_LERP_FACTOR = 0.3;
@@ -141,7 +144,7 @@ class Card {
 /**
  * Represents a playing card's position and orientation. A 2D oriented box with a fixed size.
  */
-class CardLoc {
+export class CardLoc {
 	constructor(center = { x: 0, y: 0 }, rotation = 0) {
 		/** @type {Point} */
 		this.center = { x: 0, y: 0 };
@@ -339,7 +342,7 @@ class CardLoc {
 	}
 }
 
-class EdgeSnap extends CardLoc {
+export class EdgeSnap extends CardLoc {
 	/**
 	 * @param {Object} options
 	 * @param {Point} options.center
@@ -353,7 +356,7 @@ class EdgeSnap extends CardLoc {
 	}
 }
 
-class CombinedSnap extends CardLoc {
+export class CombinedSnap extends CardLoc {
 	/**
 	 * @param {Object} options
 	 * @param {Point} options.center
@@ -371,7 +374,7 @@ class CombinedSnap extends CardLoc {
 // Should I use composition instead of inheritance?
 // It feels like "StandardPlayingCard" should be a "Card" if named as such,
 // but thinking about adding more types, it might make more sense to have a Player that owns a Card, rather than a PlayerCard that is a Card, etc.
-class StandardPlayingCard extends Card {
+export class StandardPlayingCard extends Card {
 	/**
 	 * @param {'♠'|'♥'|'♦'|'♣'} suit
 	 * @param {'A'|'2'|'3'|'4'|'5'|'6'|'7'|'8'|'9'|'10'|'J'|'Q'|'K'} value
@@ -389,7 +392,7 @@ class StandardPlayingCard extends Card {
 	}
 }
 
-class RollerCard extends Card {
+export class RollerCard extends Card {
 	constructor(deltaAngle = 45) {
 		super();
 
@@ -457,7 +460,7 @@ class RollerCard extends Card {
 	}
 }
 
-class PlayerCard extends Card {
+export class PlayerCard extends Card {
 	constructor() {
 		super();
 
@@ -587,7 +590,7 @@ class PlayerCard extends Card {
 	}
 }
 
-class FractalCard extends Card {
+export class FractalCard extends Card {
 	constructor() {
 		super();
 
@@ -653,8 +656,3 @@ function testCardLoc() {
 }
 
 testCardLoc();
-
-// window.Card = Card;
-// window.CardLoc = CardLoc;
-// window.EdgeSnap = EdgeSnap;
-// window.CombinedSnap = CombinedSnap;

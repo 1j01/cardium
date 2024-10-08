@@ -1,14 +1,16 @@
-const gameContainer = document.getElementById('gameContainer');
+import { Card, CardLoc, CombinedSnap } from "./Card.js";
+import { angleDifference } from "./helpers.js";
+
+export const gameContainer = document.getElementById('gameContainer');
 
 /** @type {WeakMap<HTMLElement, Card>} */
-const cardByElement = new WeakMap();
-window.cardByElement = cardByElement;
+export const cardByElement = new WeakMap();
 
 const MAX_SNAP_DISTANCE = 20;
 const SNAP_EQUIVALENCE_THRESHOLD = 0.1;
 const ANGLE_EQUIVALENCE_THRESHOLD = 0.1;
 
-function getAllCards() {
+export function getAllCards() {
 	return [...document.querySelectorAll('.card:not(.location-visualization)')]
 		.map(cardElement => cardByElement.get(cardElement));
 }
@@ -25,7 +27,7 @@ function anglesNearEqualOrOpposite(angle1, angle2) {
  * @param {CardLoc} cardLoc  location to check for snaps
  * @param {Card} ignoreCard  card to exclude from snap detection
  */
-function findSnap(cardLoc, ignoreCard) {
+export function findSnap(cardLoc, ignoreCard) {
 	const allSnaps = [];
 	let closestSnap = null;
 	let closestDistance = MAX_SNAP_DISTANCE;
@@ -88,7 +90,7 @@ function findSnap(cardLoc, ignoreCard) {
  * @param {CardLoc} cardLoc  location to check for collisions
  * @param {Card} ignoreCard  card to exclude from collision detection
  */
-function findCollisions(cardLoc, ignoreCard) {
+export function findCollisions(cardLoc, ignoreCard) {
 	const collisions = [];
 	for (const otherCard of getAllCards()) {
 		if (otherCard === ignoreCard) continue;

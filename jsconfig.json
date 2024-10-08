@@ -5,6 +5,12 @@
 		"lib": [
 			"es2020",
 			"dom",
+			"dom.iterable",
 		],
+		"target": "ES6",
+		"module": "ES2020",
 	},
+	"include": [
+		"src/**/*"
+	],
 }

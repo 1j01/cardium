@@ -6,7 +6,7 @@
 	"editor.codeActionsOnSave": {
 		"source.organizeImports": "always",
 	},
-	"javascript.preferences.importModuleSpecifierEnding": "js",
+	"javascript.preferences.importModuleSpecifier": "relative",
 	"typescript.preferences.importModuleSpecifierEnding": "js",
 	"html.format.unformattedContentDelimiter": "<!--no_format-->",
 }

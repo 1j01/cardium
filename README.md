@@ -18,7 +18,6 @@ Game prototype with cards that can rotate around the perimeter of other cards.
   - `findSnap` and `findCollisions`: add argument for `allCards`? would allow slight slight optimization and make it more functionally oriented
   - in `getSnaps`, clarify perpendicular to edge vs perpendicular card arrangement. maybe rename things to normal and tangent instead of perpendicular and parallel, for the vectors.
   - break up `Card.js`
-  - ESM (I would've done this from the start except it doesn't work with the `file://` protocol)
   - gameplay tests (I was really happy with the [tests I made for Junkbot](https://1j01.github.io/janitorial-android/#tests), so I'd like to do something similar here, i.e. a bespoke test runner that runs the game visually with levels constructed for testing purposes)
     - need serialization for this
   - unit tests for angle difference calculation, if only because I saw a gist with some test cases... the implementation I found is actually super intuitive, compared to many implementations you might find online.
@@ -122,3 +121,7 @@ I didn't think about dominoes when I started, but dominoes are placed snapping t
 - Bombinoes (dominoes crossed with Bomberman?)
 - Domino? what about Domiyes
 - Calminoes (a relaxing... game. nevermind what it's about. you can forget about that, and just relax. so soothing.)
+
+## Development
+
+A web server is required to run the game locally due to CORS restrictions on loading modules.

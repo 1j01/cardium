@@ -4,6 +4,9 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Cardium</title>
+	<link rel="modulepreload" href="src/helpers.js">
+	<link rel="modulepreload" href="src/Card.js">
+	<link rel="modulepreload" href="src/board.js">
 	<style>
 		body {
 			font-family: Arial, sans-serif;
@@ -151,10 +154,7 @@
 <body>
 	<div class="game-container" id="gameContainer"></div>
 
-	<script src="src/helpers.js"></script>
-	<script src="src/Card.js"></script>
-	<script src="src/board.js"></script>
-	<script src="src/game.js"></script>
+	<script src="src/game.js" type="module"></script>
 </body>
 
 </html>
