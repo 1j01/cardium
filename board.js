@@ -9,7 +9,7 @@ const SNAP_EQUIVALENCE_THRESHOLD = 0.1;
 const ANGLE_EQUIVALENCE_THRESHOLD = 0.1;
 
 function getAllCards() {
-	return [...document.querySelectorAll('.card')]
+	return [...document.querySelectorAll('.card:not(.location-visualization)')]
 		.map(cardElement => cardByElement.get(cardElement));
 }
 
@@ -178,7 +178,7 @@ gameContainer.addEventListener('pointerdown', (event) => {
 			// create cards at each snap location
 			for (const snap of card.logicalLoc.getSnaps()) {
 				const newCard = new Card();
-				newCard.element.classList.add("snap-location-visualization");
+				newCard.element.classList.add("location-visualization");
 				newCard.moveTo(card.logicalLoc, { animate: false });
 				newCard.moveTo(snap, { animate: true });
 				cardByElement.set(newCard.element, newCard);

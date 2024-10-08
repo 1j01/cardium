@@ -627,7 +627,7 @@ class FractalCard extends Card {
 				// Debug visualization
 				// This helps clarify why asymmetry is introduced.
 				const newCard = new Card();
-				newCard.element.classList.add("snap-location-visualization");
+				newCard.element.classList.add("location-visualization");
 				newCard.moveTo(this.logicalLoc, { animate: false });
 				newCard.moveTo(spawnLoc, { animate: true });
 				cardByElement.set(newCard.element, newCard);

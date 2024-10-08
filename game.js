@@ -41,6 +41,9 @@ function onKeyDown(event) {
 	if (event.key === 'r') {
 		newGame();
 	} else if (event.key === ' ') {
+		for (const visualization of document.querySelectorAll('.location-visualization')) {
+			visualization.remove();
+		}
 		for (const card of getAllCards()) {
 			if (!card.flipped) {
 				card.step?.();
