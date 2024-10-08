@@ -78,6 +78,10 @@ I chose the name Cardium because I don't have a clear idea of what the game will
 
 Maybe "Cardium" will remain the name of the game engine, while the game (or games?) can find their own names.
 
+Carbon, calcium, cadmium, caesium, and californium all start with "ca", and scandium is the only other element (currently named) with a "ca" in it.  
+Carbon gets "C", calcium gets "Ca", cadmium gets "Cd", and chromium gets "Cr". What would "cardium" be left with? "Rd"? "Ad"?  
+Tellurium gets atomic number 52, which obviously should be reserved for Cardium. So inconsiderate.  
+
 - Cardium
 - Cardscape
 - Cardarium
@@ -89,6 +93,9 @@ Maybe "Cardium" will remain the name of the game engine, while the game (or game
 - Decktris (obviously a card game related to Tetris... possibly with tetrominoes made up of 4 cards?)
 - Cardistry (the art of card manipulation; speaks to using cards in unexpected ways, especially physical arrangements and movements)
 - Minecardft (it's like Minecraft but everything's cards and you can build "minecard tracks" for "minecards" to go on and collect resources)
+- Car-related:
+  - Cardpooling (carpooling; you can have a pool of cards as well, i.e. a deck/hand/meld)
+  - Cardjacking (carjacking; jack is a card as well)
 - Drinking-related:
   - Druncard
   - Totally Nackcard
@@ -102,6 +109,8 @@ Maybe "Cardium" will remain the name of the game engine, while the game (or game
 - Cardinal Spin (like cardinal sin, but, like, cards... and rotation... birds...?)
 - CardiGAN (a generative adversarial network for generating card games, or cards, or sweaters or something)
 - Jokard (do you really need to portmanteau "joker" with "card"?)
+- Tellurium52 / Tellus52 (tellus is Latin for "earth", so this play on the atomic number of tellurium might evoke a sci-fi setting of a "world 52" as well as a pack of cards)
+- Dracocard (a palindrome. something about dragons. 🀄)
 
 The game engine is really suited to dominoes perhaps more than cards.  
 I didn't think about dominoes when I started, but dominoes are placed snapping together like the mechanics I was picturing for cards.
