@@ -182,7 +182,10 @@ gameContainer.addEventListener('pointerdown', (event) => {
 			document.body.classList.add('dragging-card');
 			cardElement.style.zIndex = String(++topZIndex);
 			cardElement.classList.add('lifted');
-			cardElement.setPointerCapture(event.pointerId);
+			// Causes cursor to be stuck as grab cursor after pressing Esc, even if releasePointerCapture is called.
+			// (One thing this could help with is to avoid the cursor flicker as the mouse leaves and enters the card when dragging quickly
+			// but I'm already using the body and a selector to change the cursor globally to take care of that.)
+			// cardElement.setPointerCapture(event.pointerId);
 		} else if (event.button === 2) {
 			card.flip();
 		} else if (event.button === 1) {
