@@ -168,6 +168,8 @@ function clearEdgeHighlights() {
 }
 
 gameContainer.addEventListener('pointerdown', (event) => {
+	endDrag({ cancel: true });
+
 	const cardElement = /** @type {HTMLElement} */(/** @type {Element} */(event.target).closest('.card'));
 	if (cardElement) {
 		const card = cardByElement.get(cardElement);
@@ -268,10 +270,11 @@ function updateDraggedCard({ clientX, clientY }) {
 	}
 }
 
-window.addEventListener('pointerup', () => {
+/** @param {{ cancel: boolean }} options */
+function endDrag({ cancel = false }) {
 	if (draggingCard) {
 		const collisions = findCollisions(draggingCard.targetVisualLoc, draggingCard);
-		if (collisions.length > 0) {
+		if (collisions.length > 0 || cancel) {
 			draggingCard.moveTo(draggingCard.logicalLoc);
 		} else {
 			draggingCard.moveTo(draggingCard.targetVisualLoc);
@@ -282,6 +285,15 @@ window.addEventListener('pointerup', () => {
 	}
 	mouseWheelAccumulator = 0;
 	clearEdgeHighlights();
+}
+
+window.addEventListener('pointerup', () => endDrag({ cancel: false }));
+window.addEventListener('pointercancel', () => endDrag({ cancel: true }));
+window.addEventListener('blur', () => endDrag({ cancel: true }));
+window.addEventListener('keydown', (event) => {
+	if (event.key === 'Escape') {
+		endDrag({ cancel: true });
+	}
 });
 
 window.addEventListener('resize', () => {

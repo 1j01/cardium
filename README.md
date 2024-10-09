@@ -26,7 +26,6 @@ Game prototype with cards that can rotate around the perimeter of other cards.
     - queued animations don't necessarily need to define their duration, they can just signal when they're done, but typically it's helpful to get the fraction of the way through an animation. (doesn't matter much if the animation system provides said fraction.)
 - UI:
   - anchor corner properly when animating roller card movement (right now the card's center position is transitioned linearly but it should go in an arc)
-  - `pointerup` is not the only thing that must end a drag. `pointercancel` should as well, but need to handle case of no event, before another `pointerdown`. handle page `blur`.
   - rotate about grabbed position? (I have a `getRotatedLoc` method now that could be used to easily try this)
   - mark edge highlights red when invalid? (the snap isn't the problem, it's a collision that makes it invalid, but on the other hand, the snap highlight is implicitly signaling that it's valid...)
   - touch controls for rotating cards
