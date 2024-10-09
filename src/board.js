@@ -177,7 +177,7 @@ gameContainer.addEventListener('pointerdown', (event) => {
 				x: event.clientX - draggingCard.visualLoc.center.x,
 				y: event.clientY - draggingCard.visualLoc.center.y
 			};
-			document.body.classList.add('dragging');
+			document.body.classList.add('dragging-card');
 			cardElement.style.zIndex = String(++topZIndex);
 			cardElement.classList.add('lifted');
 			cardElement.setPointerCapture(event.pointerId);
@@ -278,7 +278,7 @@ window.addEventListener('pointerup', () => {
 		}
 		draggingCard.element.classList.remove('lifted', 'colliding');
 		draggingCard = null;
-		document.body.classList.remove('dragging');
+		document.body.classList.remove('dragging-card');
 	}
 	mouseWheelAccumulator = 0;
 	clearEdgeHighlights();
