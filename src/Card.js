@@ -246,41 +246,50 @@ export class CardLoc {
 		/** @type {EdgeSnap[]} */
 		const snaps = [];
 		const edges = this.getEdges();
-		edges.forEach(edge => {
-			const midX = (edge[0].x + edge[1].x) / 2;
-			const midY = (edge[0].y + edge[1].y) / 2;
+		for (const edge of edges) {
+			const edgeMiddleX = (edge[0].x + edge[1].x) / 2;
+			const edgeMiddleY = (edge[0].y + edge[1].y) / 2;
 			const edgeLength = Math.hypot(edge[1].x - edge[0].x, edge[1].y - edge[0].y);
-			const perpendicular = {
+			const edgeNormalVector = {
 				x: (edge[1].y - edge[0].y) / edgeLength,
 				y: (edge[0].x - edge[1].x) / edgeLength,
 			};
-			// parallel snap
-			// TODO: rename dist, mixedDist, anotherDist
-			const dist = edgeLength < CARD_MEAN_SIDE_LENGTH ? CARD_HEIGHT / 2 : CARD_WIDTH / 2;
-			snaps.push(new EdgeSnap({
-				center: { x: midX + perpendicular.x * dist, y: midY + perpendicular.y * dist },
-				rotation: this.rotation,
-				edge,
-			}));
-			// perpendicular snaps
-			const mixedDist = (CARD_HEIGHT - CARD_WIDTH) / 2;
-			const parallel = {
+			const edgeTangentVector = {
 				x: (edge[1].x - edge[0].x) / edgeLength,
-				y: (edge[1].y - edge[0].y) / edgeLength
+				y: (edge[1].y - edge[0].y) / edgeLength,
 			};
-			const anotherDist = edgeLength < CARD_MEAN_SIDE_LENGTH ? CARD_WIDTH / 2 : CARD_HEIGHT / 2;
-			[-1, 1].forEach(sign => {
+			// Parallel snap (no rotation)
+			// There is only one because when the side lengths are equal,
+			// aligning one corner or the other is equivalent, as they both line up at once.
+			{
+				const edgeNormalDist = edgeLength < CARD_MEAN_SIDE_LENGTH ? CARD_HEIGHT / 2 : CARD_WIDTH / 2;
 				snaps.push(new EdgeSnap({
 					center: {
-						x: midX + perpendicular.x * anotherDist + parallel.x * sign * mixedDist,
-						y: midY + perpendicular.y * anotherDist + parallel.y * sign * mixedDist,
+						x: edgeMiddleX + edgeNormalVector.x * edgeNormalDist,
+						y: edgeMiddleY + edgeNormalVector.y * edgeNormalDist
 					},
-					rotation: this.rotation + 90 * sign,
+					rotation: this.rotation,
 					edge,
 				}));
-			});
-
-		});
+			}
+			// Perpendicular snaps (90 degree rotation)
+			// There are two because with differing side lengths, when aligning one corner,
+			// the other corner must overhang on the opposite side.
+			{
+				const edgeTangentDist = (CARD_HEIGHT - CARD_WIDTH) / 2;
+				const edgeNormalDist = edgeLength < CARD_MEAN_SIDE_LENGTH ? CARD_WIDTH / 2 : CARD_HEIGHT / 2;
+				for (const sign of [-1, 1]) {
+					snaps.push(new EdgeSnap({
+						center: {
+							x: edgeMiddleX + edgeNormalVector.x * edgeNormalDist + edgeTangentVector.x * sign * edgeTangentDist,
+							y: edgeMiddleY + edgeNormalVector.y * edgeNormalDist + edgeTangentVector.y * sign * edgeTangentDist,
+						},
+						rotation: this.rotation + 90 * sign,
+						edge,
+					}));
+				}
+			}
+		}
 		return snaps;
 	}
 

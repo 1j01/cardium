@@ -16,7 +16,6 @@ Game prototype with cards that can rotate around the perimeter of other cards.
 
 - technical:
   - `findSnap` and `findCollisions`: add argument for `allCards`? would allow slight slight optimization and make it more functionally oriented
-  - in `getSnaps`, clarify perpendicular to edge vs perpendicular card arrangement. maybe rename things to normal and tangent instead of perpendicular and parallel, for the vectors.
   - break up `Card.js`
   - gameplay tests (I was really happy with the [tests I made for Junkbot](https://1j01.github.io/janitorial-android/#tests), so I'd like to do something similar here, i.e. a bespoke test runner that runs the game visually with levels constructed for testing purposes)
     - need serialization for this
