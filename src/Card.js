@@ -1,5 +1,5 @@
 import { cardByElement, findCollisions, gameContainer, getAllCards } from "./board.js";
-import { alongLine, closestPointOnLineSegment } from "./helpers.js";
+import { alongLine, asTupleOf4, closestPointOnLineSegment } from "./helpers.js";
 
 const CARD_WIDTH = 100;
 const CARD_HEIGHT = 150;
@@ -216,11 +216,10 @@ export class CardLoc {
 			{ x: CARD_WIDTH / 2, y: CARD_HEIGHT / 2 },
 			{ x: -CARD_WIDTH / 2, y: CARD_HEIGHT / 2 }
 		];
-		// @ts-ignore
-		return corners.map(pt => ({
+		return asTupleOf4(corners.map(pt => ({
 			x: cx + pt.x * cos - pt.y * sin,
 			y: cy + pt.x * sin + pt.y * cos
-		}));
+		})));
 	}
 
 	/** @returns {[Edge, Edge, Edge, Edge]} */

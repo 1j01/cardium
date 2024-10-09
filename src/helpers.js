@@ -53,3 +53,30 @@ export function alongLine(lineSegment, fraction) {
 		y: a.y + (b.y - a.y) * fraction
 	};
 }
+
+/**
+ * Asserts that an array is a tuple of exactly 4 elements of the same type.
+ * 
+ * @template T
+ * @param {readonly T[]} arr  The array to assert as a tuple of length 4
+ * @throws {Error}  If the array length is not 4
+ * @returns {asserts arr is [T, T, T, T]}
+ */
+export function assertTupleOf4(arr) {
+	if (arr.length !== 4) {
+		throw new Error(`Expected array of length 4, but got length ${arr.length}`);
+	}
+}
+
+/**
+ * Asserts that an array is a tuple of exactly 4 elements of the same type and returns the array.
+ * 
+ * @template T
+ * @param {readonly T[]} arr  The array to assert as a tuple of length 4
+ * @throws {Error}  If the array length is not 4
+ * @returns {[T, T, T, T]}  The same array, now typed as a tuple of exactly 4 elements
+ */
+export function asTupleOf4(arr) {
+	assertTupleOf4(arr);
+	return arr;
+}
