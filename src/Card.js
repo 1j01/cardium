@@ -139,6 +139,12 @@ export class Card {
 			this._animId = requestAnimationFrame(() => this.animate());
 		}
 	}
+
+	// Optional methods for subclasses. Defining here was the easiest way to get the type checking to work,
+	// but it's not very sustainable.
+	step() { }
+	/** @param {-1|1} direction */
+	walk(direction) { }
 }
 
 /**
@@ -210,6 +216,7 @@ export class CardLoc {
 			{ x: CARD_WIDTH / 2, y: CARD_HEIGHT / 2 },
 			{ x: -CARD_WIDTH / 2, y: CARD_HEIGHT / 2 }
 		];
+		// @ts-ignore
 		return corners.map(pt => ({
 			x: cx + pt.x * cos - pt.y * sin,
 			y: cy + pt.x * sin + pt.y * cos

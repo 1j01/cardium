@@ -3,7 +3,7 @@ import { angleDifference } from "./helpers.js";
 
 export const gameContainer = document.getElementById('gameContainer');
 
-/** @type {WeakMap<HTMLElement, Card>} */
+/** @type {WeakMap<Element, Card>} */
 export const cardByElement = new WeakMap();
 
 const MAX_SNAP_DISTANCE = 20;
@@ -161,7 +161,7 @@ function clearEdgeHighlights() {
 }
 
 gameContainer.addEventListener('pointerdown', (event) => {
-	const cardElement = event.target.closest('.card');
+	const cardElement = /** @type {HTMLElement} */(/** @type {Element} */(event.target).closest('.card'));
 	if (cardElement) {
 		const card = cardByElement.get(cardElement);
 		if (event.button === 0) {
@@ -171,7 +171,7 @@ gameContainer.addEventListener('pointerdown', (event) => {
 				y: event.clientY - draggingCard.visualLoc.center.y
 			};
 			document.body.classList.add('dragging');
-			cardElement.style.zIndex = ++topZIndex;
+			cardElement.style.zIndex = String(++topZIndex);
 			cardElement.classList.add('lifted');
 			cardElement.setPointerCapture(event.pointerId);
 		} else if (event.button === 2) {

@@ -2,8 +2,8 @@ import { cardByElement, gameContainer, getAllCards } from "./board.js";
 import { FractalCard, PlayerCard, RollerCard, StandardPlayingCard } from "./Card.js";
 import { shuffleArray } from "./helpers.js";
 
-const suits = ['♠', '♥', '♦', '♣'];
-const values = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+const suits = /** @type {const} */(['♠', '♥', '♦', '♣']);
+const values = /** @type {const} */(['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K']);
 
 function dealCards() {
 	const deck = [];
