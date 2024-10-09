@@ -1,4 +1,7 @@
 
+/**
+ * @param {Array<any>} array
+ */
 export function shuffleArray(array) {
 	for (let i = array.length - 1; i >= 0; i--) {
 		const j = Math.floor(Math.random() * (i + 1));
@@ -6,6 +9,11 @@ export function shuffleArray(array) {
 	}
 }
 
+/**
+ * @param {number} n
+ * @param {number} m
+ * @returns {number} The remainder of n divided by m, always in the range [0, m).
+ */
 export function mod(n, m) {
 	return ((n % m) + m) % m;
 }
@@ -46,8 +54,13 @@ export function closestPointOnLineSegment(point, lineSegment) {
 	return { x: a.x + a_to_b.x * t, y: a.y + a_to_b.y * t };
 }
 
-export function alongLine(lineSegment, fraction) {
-	const [a, b] = lineSegment;
+/**
+ * @param {import("./Card").Edge} line
+ * @param {number} fraction A fraction of the distance along the line
+ * @returns {import("./Card").Point} A point on the line. If the fraction is within 0-1, the point is within the line segment.
+ */
+export function alongLine(line, fraction) {
+	const [a, b] = line;
 	return {
 		x: a.x + (b.x - a.x) * fraction,
 		y: a.y + (b.y - a.y) * fraction

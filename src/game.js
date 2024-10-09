@@ -39,6 +39,9 @@ function newGame() {
 	dealCards();
 }
 
+/**
+ * @param {KeyboardEvent} event
+ */
 function onKeyDown(event) {
 	if (event.key === 'r') {
 		newGame();

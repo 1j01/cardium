@@ -1,4 +1,4 @@
-import { Card, CardLoc, CombinedSnap } from "./Card.js";
+import { Card, CardLoc, CombinedSnap, EdgeSnap } from "./Card.js";
 import { angleDifference } from "./helpers.js";
 
 export const gameContainer = document.getElementById('gameContainer');
@@ -15,6 +15,11 @@ export function getAllCards() {
 		.map(cardElement => cardByElement.get(cardElement));
 }
 
+/**
+ * @param {number} angle1 
+ * @param {number} angle2 
+ * @returns {boolean}
+ */
 function anglesNearEqualOrOpposite(angle1, angle2) {
 	// Alternatively, could add a cycle parameter to angleDifference, and use 180 as the cycle. Would probably want to rename it cyclicDifference or something.
 	return (
@@ -28,6 +33,7 @@ function anglesNearEqualOrOpposite(angle1, angle2) {
  * @param {Card} ignoreCard  card to exclude from snap detection
  */
 export function findSnap(cardLoc, ignoreCard) {
+	/** @type {EdgeSnap[]} */
 	const allSnaps = [];
 	let closestSnap = null;
 	let closestDistance = MAX_SNAP_DISTANCE;
@@ -137,6 +143,7 @@ let draggingCard = null;
 /** @type {HTMLDivElement[]} */
 const edgeHighlights = [];
 
+/** @param {import("./Card.js").Edge} edge */
 function makeEdgeHighlight(edge) {
 	let edgeHighlight = document.createElement('div');
 	edgeHighlight.classList.add('edge-highlight');
@@ -236,6 +243,9 @@ window.addEventListener('pointermove', (event) => {
 	};
 });
 
+/**
+ * @param {{ clientX: number, clientY: number }} eventInfo
+ */
 function updateDraggedCard({ clientX, clientY }) {
 	if (draggingCard) {
 		let targetLoc = new CardLoc({

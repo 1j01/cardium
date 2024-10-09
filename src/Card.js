@@ -243,6 +243,7 @@ export class CardLoc {
 	 * The equivalent snaps are not included in the list. External code should allow 180 degree rotations.
 	 */
 	getSnaps() {
+		/** @type {EdgeSnap[]} */
 		const snaps = [];
 		const edges = this.getEdges();
 		edges.forEach(edge => {
@@ -312,6 +313,11 @@ export class CardLoc {
 		}
 
 		// Separating axis theorem (SAT) for collision detection
+		/**
+		 * @param {Point[]} verticesA
+		 * @param {Point[]} verticesB
+		 * @returns {boolean}
+		 */
 		function checkSeparatingAxis(verticesA, verticesB) {
 			let siMinus = {
 				x: verticesA[3].x - verticesA[0].x,
