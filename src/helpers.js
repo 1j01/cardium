@@ -93,3 +93,48 @@ export function asTupleOf4(arr) {
 	assertTupleOf4(arr);
 	return arr;
 }
+
+// Tests
+
+function testClosestPointOnLineSegment() {
+	const point = { x: 0, y: 0 };
+	const line = /** @type {import("./Card").Edge}*/([{ x: 0, y: 0 }, { x: 1, y: 1 }]);
+	const closest = closestPointOnLineSegment(point, line);
+	console.assert(closest.x === 0 && closest.y === 0, 'closestPointOnLineSegment failed');
+}
+
+function testAngleDifference() {
+	const angleDifferenceTests = [
+		[0, 0, 0],
+		[0, 180, 180],
+		[0, 270, -90],
+		[270, 0, 90],
+
+		[0, 360, 0],
+		[0, -360, 0],
+		[360, 0, 0],
+		[-360, 0, 0],
+
+		// Test cases from https://gist.github.com/bradphelan/7fe21ad8ebfcb43696b8
+		[1, 2, 1],
+
+		[1, 2 + 360, 1],
+		[1, 2 - 360, 1],
+		[1 + 360, 2, 1],
+		[1 - 360, 2, 1],
+
+		[2, 1, -1],
+
+		[2, 1 - 360, -1],
+		[2, 1 + 360, -1],
+		[2 + 360, 1, -1],
+		[2 - 360, 1, -1],
+	]
+	for (const [currentAngle, targetAngle, expected] of angleDifferenceTests) {
+		const actual = angleDifference(currentAngle, targetAngle);
+		console.assert(actual === expected, `angleDifference(${currentAngle}, ${targetAngle}) returned ${actual}, expected ${expected}`);
+	}
+}
+
+testClosestPointOnLineSegment();
+testAngleDifference();

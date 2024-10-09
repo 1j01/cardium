@@ -19,7 +19,6 @@ Game prototype with cards that can rotate around the perimeter of other cards.
   - break up `Card.js`
   - gameplay tests (I was really happy with the [tests I made for Junkbot](https://1j01.github.io/janitorial-android/#tests), so I'd like to do something similar here, i.e. a bespoke test runner that runs the game visually with levels constructed for testing purposes)
     - need serialization for this
-  - unit tests for angle difference calculation, if only because I saw a gist with some test cases... the implementation I found is actually super intuitive, compared to many implementations you might find online.
   - animation system
     - queue animations (per card, or globally? or both?)
     - speed up in-progress animations when queueing new ones in order to get to new inputs in a timely fashion
