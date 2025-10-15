@@ -31,8 +31,6 @@ Game prototype with cards that can rotate around the perimeter of other cards.
   - touch controls for rotating cards
     - on-screen buttons
     - ideally, support multitouch to rotate as well
-  - touch controls for moving player / taking turns
-  - ~~animation for snapping?~~ nah, smoothing it feels bad. it should feel snappy!
   - could maybe use a higher threshold for unsnapping compared to snapping, to stabilize the snapping state/behavior
   - undo/redo
   - zooming and panning
