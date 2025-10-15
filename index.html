@@ -148,10 +148,50 @@
 			z-index: 50000;
 			/*mix-blend-mode: screen;*/
 		}
+
+		.game-controls {
+			position: absolute;
+			top: 10px;
+			left: 50%;
+			transform: translateX(-50%);
+			z-index: 1000;
+			color: white;
+			text-shadow: 0 0 5px black;
+			text-align: center;
+		}
+
+		.game-controls button {
+			margin: 0 5px;
+			padding: 10px 20px;
+			font-size: 16px;
+			border: 1px solid #000000;
+			border-radius: 5px;
+			background-color: #acd9ff;
+			color: black;
+			cursor: pointer;
+		}
+
+		.game-controls button:hover {
+			background-color: #8fc7ff;
+		}
+
+		.game-controls button:active {
+			background-color: #66abff;
+		}
 	</style>
 </head>
 
 <body>
+	<div class="game-controls">
+		<button id="resetButton">Reset (R)</button>
+		<button id="stepButton">Step (Space)</button>
+		<button id="leftButton">Left (←)</button>
+		<button id="rightButton">Right (→)</button>
+		<br>
+		<p>
+			Drag and drop cards and snap them together. Use the mouse wheel to rotate a card while dragging.
+		</p>
+	</div>
 	<div class="game-container" id="gameContainer"></div>
 
 	<script src="src/game.js" type="module"></script>

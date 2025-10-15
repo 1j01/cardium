@@ -39,6 +39,28 @@ function newGame() {
 	dealCards();
 }
 
+function stepGame() {
+	for (const visualization of document.querySelectorAll('.location-visualization')) {
+		visualization.remove();
+	}
+	for (const card of getAllCards()) {
+		if (!card.flipped) {
+			card.step?.();
+		}
+	}
+}
+
+/**
+ * @param {1 | -1} direction
+ */
+function walkPlayer(direction) {
+	for (const card of getAllCards()) {
+		if (!card.flipped) {
+			card.walk?.(direction);
+		}
+	}
+}
+
 /**
  * @param {KeyboardEvent} event
  */
@@ -46,23 +68,16 @@ function onKeyDown(event) {
 	if (event.key === 'r') {
 		newGame();
 	} else if (event.key === ' ') {
-		for (const visualization of document.querySelectorAll('.location-visualization')) {
-			visualization.remove();
-		}
-		for (const card of getAllCards()) {
-			if (!card.flipped) {
-				card.step?.();
-			}
-		}
+		stepGame();
 	} else if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
-		for (const card of getAllCards()) {
-			if (!card.flipped) {
-				card.walk?.(event.key === 'ArrowRight' ? 1 : -1);
-			}
-		}
+		walkPlayer(event.key === 'ArrowRight' ? 1 : -1);
 	}
 }
 
 document.addEventListener('keydown', onKeyDown);
+document.getElementById('resetButton').addEventListener('click', () => newGame());
+document.getElementById('stepButton').addEventListener('click', () => stepGame());
+document.getElementById('rightButton').addEventListener('click', () => walkPlayer(1));
+document.getElementById('leftButton').addEventListener('click', () => walkPlayer(-1));
 
 newGame();
