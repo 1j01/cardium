@@ -122,3 +122,8 @@ I didn't think about dominoes when I started, but dominoes are placed snapping t
 ## Development
 
 A web server is required to run the game locally due to CORS restrictions on loading modules.
+
+## License
+
+MIT License, see [LICENSE.txt](LICENSE.txt) for details.
+
